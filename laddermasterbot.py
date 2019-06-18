@@ -12,6 +12,7 @@ class player:
         self.rank = size
         self.dummy = 0;
         self.confirmId = ""
+        self.challengeID = ""
         
         
 def saveTable(tableData):
@@ -64,6 +65,16 @@ async def ladder(ctx):
 
     msg += "```"
     await ctx.send(msg)
+
+@bot.command()
+async def challenge(ctx, target : discord.Member):
+    tableData = loadTable();
+    
+    for i in tableData:
+        if str(i.discordid) == str(ctx.author):
+            p1 = i;
+    
+    await ctx.send(target.mention + ": you have been challenged to a match by {} ({})".format(p1.tag, ctx.author))
 
 
 @bot.command()
@@ -143,6 +154,7 @@ async def deny(ctx, winner : discord.Member):
         await ctx.send("Set results have been invalidated");
     else:
         await ctx.send("You don't have any pending sets against this person")    
+'''
 
 bot.run(TOKEN)
 
