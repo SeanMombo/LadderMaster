@@ -299,7 +299,6 @@ def updateSheet(tableD):
         workSheet.update_cell(11+x, 7, i.tag)
         cList = ""
         for c in i.characters:
-            print(c)
             cList += c + ", "
 
         cList = cList[:-2]
