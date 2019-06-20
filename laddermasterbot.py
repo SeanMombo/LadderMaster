@@ -43,7 +43,7 @@ def loadLadders():
         return pickle.load(input)
 
 
-TOKEN = "NTkwNjYzNjExMTY1MTc5OTcw.XQvGog.T56-3Q2kLgnBFuPKd2C0Q1MD56Q"
+TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XP6pEQ.fMFiHX0RgXs0ipzUv1iccC68Xi8"
 
 bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
