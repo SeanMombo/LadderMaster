@@ -72,9 +72,9 @@ async def on_command_error(ctx, error):
                 "The correct usage is !addMember <@player> <tag> <game>"
             )
         if str(ctx.command) == "removeMember":
-        await ctx.send(
-            "The correct usage is !removeMember <@player> <game>"
-        )
+            await ctx.send(
+                "The correct usage is !removeMember <@player> <game>"
+            )
         if str(ctx.command) == "moveUp":
             await ctx.send("The correct usage is !moveUp <@player> <game>")
         if str(ctx.command) == "moveDown":
