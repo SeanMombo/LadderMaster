@@ -1,10 +1,15 @@
-import pickle
-import operator
 import discord
 from discord.ext import commands
 from discord.utils import get
-import traceback
 from texttable import Texttable
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+import sched
+import time
+import pickle
+import operator
+import traceback
 
 # global vars
 admin_role = "adminy"
@@ -48,11 +53,15 @@ bot.remove_command("help")
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRole):
         await ctx.send("You don't have permission to use this command YOU IDIOT.")
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(
+            "That command doesn't exist, type !help or !helpadmin for a list of commands"
+        )
     if isinstance(error, commands.MissingRequiredArgument):
         if str(ctx.command) == "ladder":
             await ctx.send("The correct usage is !ladder <game>")
         if str(ctx.command) == "joinLadder":
-            await ctx.send("The correct usage is !joinLadder <game> <tag>")
+            await ctx.send("The correct usage is !joinLadder <tag> <game>")
         if str(ctx.command) == "quitLadder":
             await ctx.send("The correct usage is !quitLadder <game>")
         if str(ctx.command) == "changeTag":
@@ -68,26 +77,20 @@ async def on_command_error(ctx, error):
         if str(ctx.command) == "deny":
             await ctx.send("The correct usage is !deny <@opponent> <game>")
         if str(ctx.command) == "addMember":
-            await ctx.send(
-                "The correct usage is !addMember <@player> <tag> <game>"
-            )
+            await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
         if str(ctx.command) == "removeMember":
-            await ctx.send(
-                "The correct usage is !removeMember <@player> <game>"
-            )
+            await ctx.send("The correct usage is !removeMember <@player> <game>")
         if str(ctx.command) == "moveUp":
             await ctx.send("The correct usage is !moveUp <@player> <game>")
         if str(ctx.command) == "moveDown":
-            await ctx.send(
-                "The correct usage is !moveDown <@player> <game>"
-            )
+            await ctx.send("The correct usage is !moveDown <@player> <game>")
 
 
 # help
 @bot.command()
 async def help(ctx):
     ladders = loadLadders()
-    msg = """```Current commands:
+    msg = """```Commands:
 - !ladder <game>: displays ladder
 
 - !joinLadder <tag> <game>: allows you to join a ladder
@@ -116,18 +119,18 @@ The current possible games are:"""
 # help for admins
 @bot.command()
 @commands.has_role(admin_role)
-async def helpadmin(ctx):
-    ladders = loadLadders()
-    msg = """```Current commands:
-- !addMember <@player> <tag> <game>: adds a member to a ladder (admin only)
+async def helpladdermanager(ctx):
+    msg = """```Ladder Manager commands:
+- !addMember <@player> <tag> <game>: adds a member to a ladder (Ladder Manager only)
 
-- !removeMember <@player> <game>: removes a member from a ladder (admin only)
+- !removeMember <@player> <game>: removes a member from a ladder (Ladder Manager only)
 
-- !moveUp <@player> <tag> <game>: moves someone up a rank (admin only)
+- !moveUp <@player> <tag> <game>: moves someone up a rank (Ladder Manager only)
 
-- !moveDown <@player> <tag> <game>: moves someone down a rank (admin only)"""
+- !moveDown <@player> <tag> <game>: moves someone down a rank (Ladder Manager only)"""
     msg += "```"
     await ctx.send(msg)
+
 
 # ititializes blank ladders for the first time, DO NOT RUN THIS IN THE FUTURE
 @bot.command()
@@ -163,7 +166,7 @@ async def joinLadder(ctx, tag, ladderName):
         await ctx.send(errmsg)
         return
 
-    p1 = player(tag, "{0}".format(ctx.author))
+    _player = player(tag, "{0}".format(ctx.author))
 
     add = True
     for i in ladderData:
@@ -173,7 +176,7 @@ async def joinLadder(ctx, tag, ladderName):
             return
 
     if add:
-        ladderData.append(p1)
+        ladderData.append(_player)
         saveLadders(ladders)
 
     msg = "{}".format(ctx.author)
@@ -229,14 +232,16 @@ async def changeTag(ctx, newTag, ladderName):
         ladderName = ladderName.lower()
         ladderData = ladders[ladderName]
     except KeyError:
-        errmsg = "Correct usage is !changeTag <new_tag> <game>.\n" "Possible games are: "
+        errmsg = (
+            "Correct usage is !changeTag <new_tag> <game>.\n" "Possible games are: "
+        )
         for key in ladders:
             errmsg += "'" + key + "'" + ", "
         errmsg = errmsg[:-2]
         errmsg += ". "
         await ctx.send(errmsg)
         return
-    
+
     # get player info
     _player = None
     for i in ladderData:
@@ -460,24 +465,21 @@ async def confirm(ctx, winner: discord.Member, ladderName):
             winner = i
 
     loser_old_rank = ladderData.index(loser)
-    print(loser_old_rank)
     winner_old_rank = ladderData.index(winner)
-    print(winner_old_rank)
 
-    # check rank difference
-    if loser_old_rank > winner_old_rank:
-        await ctx.send("No need to swap, loser is already below winner")
     # swap ranks between winner and loser
-    elif winner.confirmId == loser.discordid:
-        ladderData[loser_old_rank] = winner
-        ladderData[winner_old_rank] = loser
-        winner.confirmId = ""
-        loser.confirmId = ""
-        await ctx.send("Set results confirmed. Ranks have been swapped")
+    if winner.confirmId == loser.discordid:
+        # check rank difference
+        if loser_old_rank > winner_old_rank:
+            await ctx.send("No need to swap, loser is already below winner")
+        else:
+            ladderData[loser_old_rank] = winner
+            ladderData[winner_old_rank] = loser
+            winner.confirmId = ""
+            loser.confirmId = ""
+            await ctx.send("Set results confirmed. Ranks have been swapped")
     else:
         await ctx.send("You don't have any pending sets against this person")
-        winner.confirmId = ""
-        loser.confirmId = ""
 
     saveLadders(ladders)
 
@@ -536,7 +538,7 @@ async def addMember(ctx, new_player: discord.Member, tag, ladderName):
         return
 
     # code essentially same as !joinLadder
-    new_player = player(tag, "{0}".format(new_player))
+    _player = player(tag, "{0}".format(new_player))
 
     add = True
     for i in ladderData:
@@ -546,10 +548,10 @@ async def addMember(ctx, new_player: discord.Member, tag, ladderName):
             return
 
     if add:
-        ladderData.append(new_player)
+        ladderData.append(_player)
         saveLadders(ladders)
 
-    msg = new_player.discordid
+    msg = _player.discordid
     msg += " has joined the " + ladderName + " ladder as '"
     msg += tag + "'."
 
