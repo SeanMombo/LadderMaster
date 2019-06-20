@@ -35,7 +35,7 @@ class player:
 def saveLadders(ladders):
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
-    updatesheet(ladders)
+    updateSheet(ladders)
 
 
 # helper function, loads ladders from pkl
@@ -119,7 +119,6 @@ The current possible games are:"""
 
 # help for admins
 @bot.command()
-<<<<<<< HEAD
 @commands.has_role(admin_role)
 async def helpladdermanager(ctx):
     msg = """```Ladder Manager commands:
@@ -184,41 +183,9 @@ async def joinLadder(ctx, tag, ladderName):
     msg = "{}".format(ctx.author)
     msg += " has joined the " + ladderName + " ladder as '"
     msg += tag + "'."
-=======
-async def challenge(ctx, target: discord.Member):
-    tableData = loadTable()
-
-    p1 = ""
-    p2 = ""
-    for i in tableData:
-        if str(i.discordid) == str(ctx.author):
-            p1 = i
-        if str(i.discordid) == str(target):
-            p2 = i
-
-    if p1 == "" or p2 == "":
-        await ctx.send("You or your opponent are not on the ladder")
-        return False
-
-    '''if (str(p2.challengeId) != ""): #abort challenge if target isn't avaliable
-        await ctx.send("Opponent has already been challenged");
-        return;'''
-
-    if (str(p1.challengeId) != ""):
-        await ctx.send("You already have a challenge pending to {}".format(p1.challengeId))
-        return
-
-    p1.challengeId = p2.discordid
-    p1.challengeMember = target.id
-    p1.challengeTimer = time.time()
-    saveTable(tableData)
-
-    await ctx.send(target.mention + ": you have been challenged to a match by {} ({})".format(p1.tag, ctx.author))
->>>>>>> 9fbc5bb8da094fecfe0c03075ef671cca34d841a
 
     await ctx.send(msg)
 
-<<<<<<< HEAD
 
 # quits a ladder
 @bot.command()
@@ -250,11 +217,6 @@ async def quitLadder(ctx, ladderName):
 
     ladderData.remove(_player)
     saveLadders(ladders)
-=======
-@bot.command()
-async def cancelChallenge(ctx):
-    tableData = loadTable()
->>>>>>> 9fbc5bb8da094fecfe0c03075ef671cca34d841a
 
     msg = "{}".format(ctx.author)
     msg += " has quit the " + ladderName + " ladder."
@@ -285,7 +247,6 @@ async def changeTag(ctx, newTag, ladderName):
     _player = None
     for i in ladderData:
         if str(i.discordid) == str(ctx.author):
-<<<<<<< HEAD
             _player = i
 
     # if player doesn't exist:
@@ -300,31 +261,10 @@ async def changeTag(ctx, newTag, ladderName):
     msg += " has changed their tag to " + newTag + "."
 
     await ctx.send(msg)
-=======
-            p1 = i
-
-    if p1 == "":
-        await ctx.send("You aren't on the ladder")
-        return False
-    else:
-        if p1.challengeId != "":
-            p2Id = p1.challengeId
-
-    for i in tableData:
-        if str(i.discordid) == str(p2Id):
-            p2 = i
-
-    await ctx.send("{}, your challenge to <@{}> has been cancelled".format(ctx.author, p1.challengeMember))
-    p1.challengeId = ""
-    p1.challengeMember = ""
-
-    saveTable(tableData)
->>>>>>> 9fbc5bb8da094fecfe0c03075ef671cca34d841a
 
 
 # adds a character to character list
 @bot.command()
-<<<<<<< HEAD
 async def addCharacter(ctx, char, ladderName):
     ladders = loadLadders()
     try:
@@ -369,34 +309,6 @@ async def clearCharacters(ctx, ladderName):
     for i in ladderData:
         if str(i.discordid) == str(ctx.author):
             i.characters.clear()
-=======
-async def beat(ctx, loser: discord.Member):
-    tableData = loadTable()
-
-    p1 = 0
-    p2 = 0
-
-    # get player info
-    for i in tableData:
-        if str(i.discordid) == str(ctx.author):
-            p1 = i
-        if str(i.discordid) == str(loser):
-            p2 = i
-
-    r1 = p1.rank
-    r2 = p2.rank
-
-    # send confirmation
-    if abs(r1-r2) <= 2:
-        if str(p1.confirmId) == "":
-            p1.confirmId = p2.discordid
-
-            await ctx.send(loser.mention + " please type !confirm or !deny, followed by @ing your last opponent to validate the set results")
-        else:
-            await ctx.send("You must wait until your last opponent confirms the results of your set")
-
-    saveTable(tableData)
->>>>>>> 9fbc5bb8da094fecfe0c03075ef671cca34d841a
 
     saveLadders(ladders)
     await ctx.send("Character list cleared for " + ladderName + ".")
@@ -404,7 +316,6 @@ async def beat(ctx, loser: discord.Member):
 
 # display ladder info
 @bot.command()
-<<<<<<< HEAD
 async def ladder(ctx, ladderName):
     ladders = loadLadders()
     try:
@@ -570,37 +481,9 @@ async def confirm(ctx, winner: discord.Member, ladderName):
             await ctx.send("Set results confirmed. Ranks have been swapped")
     else:
         await ctx.send("You don't have any pending sets against this person")
-=======
-async def confirm(ctx, loser: discord.Member):
-    tableData = loadTable()
-
-    p1 = 0
-    p2 = 0
-
-    # check rank difference
-    for i in tableData:
-        if str(i.discordid) == str(ctx.author):
-            p1 = i
-        if str(i.discordid) == str(loser):
-            p2 = i
-
-    # swap ranks between winner and loser
-    if p2.confirmId == p1.discordid:
-        t = p1.rank
-        p1.rank = p2.rank
-        p2.rank = t
-        p1.confirmId = ""
-        p2.confirmId = ""
-        await ctx.send("Set results confirmed. Ranks have been swapped")
-    else:
-        await ctx.send("You don't have any pending sets against this person")
-
-    saveTable(tableData)
->>>>>>> 9fbc5bb8da094fecfe0c03075ef671cca34d841a
 
     saveLadders(ladders)
 
-<<<<<<< HEAD
 
 # denies the result of a set
 @bot.command()
@@ -785,34 +668,7 @@ async def moveDown(ctx, _player: discord.Member, ladderName):
         ladderData[old_player_idx + 1] = temp
         saveLadders(ladders)
         await ctx.send("Player shuffled down")
-=======
-@bot.command()
-async def deny(ctx, winner: discord.Member):
-    tableData = loadTable()
 
-    p1 = 0
-    p2 = 0
-    # get player info
-    for i in tableData:
-        if str(i.discordid) == str(ctx.author):
-            p1 = i
-        if str(i.discordid) == str(winner):
-            p2 = i
-
-    if p2.confirmId == p1.discordid:
-        p1.confirmId = ""
-        p2.confirmId = ""
-        await ctx.send("Set results have been invalidated")
-    else:
-        await ctx.send("You don't have any pending sets against this person")
-
-
-# SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
->>>>>>> 9fbc5bb8da094fecfe0c03075ef671cca34d841a
-
-def updateSheet(tableD):
-
-<<<<<<< HEAD
 # tests if bot's up (dev purposes only)
 @bot.command()
 @commands.has_role(admin_role)
@@ -964,50 +820,5 @@ if __name__ == "__main__":
 
 #     saveLadders(ladders)
 #     await ctx.send("Added dummies to " + ladderName)
-=======
-    # use creds to create a client to interact with the Google Drive API
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        'client_secret.json', scope)
-    client = gspread.authorize(creds)
->>>>>>> 9fbc5bb8da094fecfe0c03075ef671cca34d841a
-
-    sheet = client.open("TestLadderMasterSheet")
-    meleeSheet = sheet.worksheet('Melee')
-    unistSheet = sheet.worksheet('UNIST')
-    tekkenSheet = sheet.worksheet('Tekken')
-    smushSheet = sheet.worksheet('SmUsh')
-    sf3sSheet = sheet.worksheet('SF3S')
-    dbfzSheet = sheet.worksheet('DBFZ')
-
-
-    tableData = tableD
-    # 'unist', 'tekken', 'melee', 'smush', 'sf3s', 'dbfz'.
-    '''meleeData = tableData['melee']
-    unistData = tableData['unist']
-    tekkenData = tableData['tekken']
-    smushData = tableData['smush']
-    sf3sData = tableData['sf3s']
-    dbfzData = tableData['dbfz']'''
-
-    x = 0
-    yoff = 12
-    for i in tableData:
-        if x == 0:  # skip dummy acc
-            x += 1
-            continue
-
-        meleeSheet.update_cell(yoff + x, 6, x) #rank
-        meleeSheet.update_cell(yoff + x, 7, i.tag)
-        cList = ""
-        for c in i.characters:
-            cList += c + ", "
-
-        cList = cList[:-2]
-        meleeSheet.update_cell(yoff + x, 8, cList)
-        meleeSheet.update_cell(yoff + x, 9, i.discordid)
-        x += 1
-
 
 bot.run(TOKEN)
