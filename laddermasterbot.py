@@ -12,8 +12,8 @@ import operator
 import traceback
 
 # global vars
-admin_role = "adminy"
-comm_prefix = "."
+admin_role = "Ladder Manager"
+comm_prefix = "!"
 
 # try:
 
@@ -674,6 +674,41 @@ async def moveDown(ctx, _player: discord.Member, ladderName):
 @commands.has_role(admin_role)
 async def works(ctx):
     await ctx.send("bot's up atm")
+
+
+# SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
+def updateSheet(ladders):
+    ladders = loadLadders()
+
+    # use creds to create a client to interact with the Google Drive API
+    scope = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        "client_secret.json", scope
+    )
+    client = gspread.authorize(creds)
+
+    sheet = client.open("TestLadderMasterSheet")
+
+    rank = 0
+    yoff = 12
+    # iterate over ladder dict
+    for ladderName, ladderData in ladders:
+        for _player in ladderData:
+            ladderSheet = sheet.worksheet(ladderName)
+
+            ladderSheet.update_cell(yoff + rank, 6, rank)  # rank
+            ladderSheet.update_cell(yoff + rank, 7, _player.tag)
+            cList = ""
+            for c in _player.characters:
+                cList += c + ", "
+
+            cList = cList[:-2]
+            ladderSheet.update_cell(yoff + rank, 8, cList)
+            ladderSheet.update_cell(yoff + rank, 9, _player.discordid)
+            rank += 1
 
 
 if __name__ == "__main__":
