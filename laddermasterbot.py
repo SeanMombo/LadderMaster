@@ -76,7 +76,7 @@ async def joinLadder(ctx, tag):
 @bot.command()
 async def addCharacter(ctx, char):
     tableData = loadTable()
-    
+
     for i in tableData:
         if str(i.discordid) == str(ctx.author):
             i.characters.append(char)
@@ -84,16 +84,18 @@ async def addCharacter(ctx, char):
     saveTable(tableData)
     await ctx.send('{} added to character list'.format(char))
 
+
 @bot.command()
 async def clearCharacters(ctx):
     tableData = loadTable()
-    
+
     for i in tableData:
         if str(i.discordid) == str(ctx.author):
             i.characters.clear()
 
     saveTable(tableData)
     await ctx.send('Character list cleared')
+
 
 @bot.command()
 async def ladder(ctx):
@@ -279,7 +281,13 @@ def updateSheet(tableD):
     client = gspread.authorize(creds)
 
     sheet = client.open("TestLadderMasterSheet")
-    workSheet = sheet.worksheet('meleeSheet')
+    meleeSheet = sheet.worksheet('Melee')
+    unistSheet = sheet.worksheet('UNIST')
+    tekkenSheet = sheet.worksheet('Tekken')
+    smushSheet = sheet.worksheet('SmUsh')
+    sf3sSheet = sheet.worksheet('SF3S')
+    dbfzSheet = sheet.worksheet('DBFZ')
+
 
     tableData = tableD
     # 'unist', 'tekken', 'melee', 'smush', 'sf3s', 'dbfz'.
@@ -291,19 +299,21 @@ def updateSheet(tableD):
     dbfzData = tableData['dbfz']'''
 
     x = 0
+    yoff = 12
     for i in tableData:
-        if x == 0: #skip dummy acc
+        if x == 0:  # skip dummy acc
             x += 1
             continue
 
-        workSheet.update_cell(11+x, 7, i.tag)
+        meleeSheet.update_cell(yoff + x, 6, x) #rank
+        meleeSheet.update_cell(yoff + x, 7, i.tag)
         cList = ""
         for c in i.characters:
             cList += c + ", "
 
         cList = cList[:-2]
-        workSheet.update_cell(11+x, 8, cList)
-        workSheet.update_cell(11+x, 9, i.discordid)
+        meleeSheet.update_cell(yoff + x, 8, cList)
+        meleeSheet.update_cell(yoff + x, 9, i.discordid)
         x += 1
 
 
