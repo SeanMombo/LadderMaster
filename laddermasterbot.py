@@ -53,6 +53,10 @@ async def on_command_error(ctx, error):
             await ctx.send("The correct usage is !ladder <game>")
         if str(ctx.command) == "joinLadder":
             await ctx.send("The correct usage is !joinLadder <game> <tag>")
+        if str(ctx.command) == "quitLadder":
+            await ctx.send("The correct usage is !quitLadder <game>")
+        if str(ctx.command) == "changeTag":
+            await ctx.send("The correct usage is !changeLadder <newTag> <game>")
         if str(ctx.command) == "addCharacter":
             await ctx.send("The correct usage is !addCharacter <character> <game>")
         if str(ctx.command) == "clearCharacters":
@@ -67,6 +71,10 @@ async def on_command_error(ctx, error):
             await ctx.send(
                 "The correct usage is !addMember <@player> <tag> <game>"
             )
+        if str(ctx.command) == "removeMember":
+        await ctx.send(
+            "The correct usage is !removeMember <@player> <game>"
+        )
         if str(ctx.command) == "moveUp":
             await ctx.send("The correct usage is !moveUp <@player> <game>")
         if str(ctx.command) == "moveDown":
