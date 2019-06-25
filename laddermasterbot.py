@@ -44,7 +44,7 @@ def loadLadders():
 
 
 #TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XP6pEQ.fMFiHX0RgXs0ipzUv1iccC68Xi8"
-TOKEN = 'NTkyOTAwMTQwOTIzMjI0MDg5.XRGD4g.HcD9dXkM6PwSK71SsK-u4UY0TAE'
+#TOKEN = 'NTkyOTAwMTQwOTIzMjI0MDg5.XRGD4g.HcD9dXkM6PwSK71SsK-u4UY0TAE'
 
 bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
@@ -120,7 +120,7 @@ The current possible games are:"""
 # help for admins
 @bot.command()
 @commands.has_role(admin_role)
-async def helpladdermanager(ctx):
+async def helpadmin(ctx):
     msg = """```Ladder Manager commands:
 - !addMember <@player> <tag> <game>: adds a member to a ladder (Ladder Manager only)
 
@@ -343,7 +343,7 @@ async def ladder(ctx, ladderName):
     gameName = gameNames[ladderName]
 
     # adaptive text formatting rofl
-    msg = "```\n------------------"
+    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
     for i in range(0, len(gameName)):
         msg += "-"
     msg += "\n-- QFGC " + gameName + " LADDER --\n"
