@@ -44,7 +44,7 @@ def loadLadders():
         return pickle.load(input)
 
 
-#TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XP6pEQ.fMFiHX0RgXs0ipzUv1iccC68Xi8"
+
 
 TOKEN = ""
 f = open("key.txt", "r")
@@ -59,6 +59,10 @@ bot.remove_command("help")
 #error handler (mutes errors so comment this out when debugging)
 @bot.event
 async def on_command_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        if str(ctx.command) == "addMember":
+            await ctx.send("That player was not found")
+
     if isinstance(error, commands.MissingRole):
         await ctx.send("You don't have permission to use this command YOU IDIOT.")
     if isinstance(error, commands.CommandNotFound):
@@ -104,6 +108,8 @@ async def help(ctx):
 - !joinLadder <tag> <game>: allows you to join a ladder
 
 - !quitLadder <game>: allows you to quit a ladder
+
+- !changeTag <new tag> <game>: changes your tag for a certain game
 
 - !addCharacter <character> <game>: adds ONE character to your list of characters
 
@@ -700,7 +706,7 @@ def updateSheet(ladders):
     )
     client = gspread.authorize(creds)
 
-    sheet = client.open("TestLadderMasterSheet")
+    sheet = client.open("QFGC Linear Ladder Sheets")
 
     # iterate over ladder dict
     for ladderName, ladderData in ladders.items():
