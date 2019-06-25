@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-from texttable import Texttable
+#from texttable import Texttable
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -317,6 +317,7 @@ async def clearCharacters(ctx, ladderName):
 @bot.command()
 async def ladder(ctx, ladderName):
     ladders = loadLadders()
+    updateSheet(ladders)
     try:
         ladderName = ladderName.lower()
         ladderData = ladders[ladderName]
@@ -384,6 +385,7 @@ async def ladder(ctx, ladderName):
         rank_counter += 1
 
     msg += "```"
+
     await ctx.send(msg)
 
 
@@ -698,27 +700,48 @@ def updateSheet(ladders):
 
         # clear cells F13:I33
         cell_list = ladderSheet.range('F13:I33')
-        for cell in cell_list:
-            cell.value = '2'
-        ladderSheet.update_cells(cell_list)
         
         rank = 0
         yoff = 13
+
+        plist = []
+        plist2 = []
         for _player in ladderData:
-            # update
-            ladderSheet.update_cell(yoff + rank, 6, rank+1)  # rank
-            ladderSheet.update_cell(yoff + rank, 7, _player.tag)
+            plist = []
+            plist.append(rank+1)
+            plist.append(_player.tag)
+
             cList = ""
             for c in _player.characters:
                 cList += c + ", "
 
             cList = cList[:-2]
-            ladderSheet.update_cell(yoff + rank, 8, cList)
-            ladderSheet.update_cell(yoff + rank, 9, _player.discordid)
+            plist.append(cList)
+            plist.append(_player.discordid)
+            plist2.append(plist)
+            
             rank += 1
+
+        xx = 0
+        yy = 0
+        for cell in cell_list:
+            cell.value = ''
+
+            yy = cell.row-13
+            xx = cell.col-6
+            print(ladderData[xx].tag)
+            #lis = plist2[xx]
+            #cell.value = lis[yy]
+           
+        
+        #ladderSheet.update_cells(cell_list)
+
+
+
 
 if __name__ == "__main__":
     bot.run(TOKEN)
+
 
 #### TABLED CODE ######
 
@@ -827,4 +850,4 @@ if __name__ == "__main__":
 #     saveLadders(ladders)
 #     await ctx.send("Added dummies to " + ladderName)
 
-bot.run(TOKEN)
+#bot.run(TOKEN)
