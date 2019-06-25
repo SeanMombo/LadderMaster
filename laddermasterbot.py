@@ -317,7 +317,7 @@ async def clearCharacters(ctx, ladderName):
 @bot.command()
 async def ladder(ctx, ladderName):
     ladders = loadLadders()
-    updateSheet(ladders)
+    
     try:
         ladderName = ladderName.lower()
         ladderData = ladders[ladderName]
