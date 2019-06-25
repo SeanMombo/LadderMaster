@@ -700,43 +700,31 @@ def updateSheet(ladders):
 
         # clear cells F13:I33
         cell_list = ladderSheet.range('F13:I33')
-        
-        rank = 0
-        yoff = 13
-
-        plist = []
-        plist2 = []
-        for _player in ladderData:
-            plist = []
-            plist.append(rank+1)
-            plist.append(_player.tag)
-
-            cList = ""
-            for c in _player.characters:
-                cList += c + ", "
-
-            cList = cList[:-2]
-            plist.append(cList)
-            plist.append(_player.discordid)
-            plist2.append(plist)
-            
-            rank += 1
 
         xx = 0
         yy = 0
+
         for cell in cell_list:
             cell.value = ''
 
             yy = cell.row-13
             xx = cell.col-6
-            print(ladderData[xx].tag)
-            #lis = plist2[xx]
-            #cell.value = lis[yy]
-           
-        
-        #ladderSheet.update_cells(cell_list)
+            if yy < len(ladderData):
+                if xx == 0:
+                    cell.value = yy+1
+                elif xx == 1:
+                    cell.value = ladderData[yy].tag
+                elif xx == 2:
+                    cList = ""
+                    for c in ladderData[yy].characters:
+                        cList += c + ", "
 
+                    cList = cList[:-2]
+                    cell.value = cList
+                elif xx == 3:
+                    cell.value = ladderData[yy].discordid
 
+        ladderSheet.update_cells(cell_list)
 
 
 if __name__ == "__main__":
@@ -850,4 +838,4 @@ if __name__ == "__main__":
 #     saveLadders(ladders)
 #     await ctx.send("Added dummies to " + ladderName)
 
-#bot.run(TOKEN)
+# bot.run(TOKEN)
