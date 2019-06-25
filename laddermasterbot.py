@@ -45,7 +45,13 @@ def loadLadders():
 
 
 #TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XP6pEQ.fMFiHX0RgXs0ipzUv1iccC68Xi8"
-#TOKEN = 'NTkyOTAwMTQwOTIzMjI0MDg5.XRGD4g.HcD9dXkM6PwSK71SsK-u4UY0TAE'
+
+TOKEN = ""
+f = open("key.txt", "r")
+if f.mode == 'r':
+    TOKEN = f.read()
+
+
 
 bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
