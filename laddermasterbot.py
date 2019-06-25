@@ -43,47 +43,48 @@ def loadLadders():
         return pickle.load(input)
 
 
-TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XP6pEQ.fMFiHX0RgXs0ipzUv1iccC68Xi8"
+#TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XP6pEQ.fMFiHX0RgXs0ipzUv1iccC68Xi8"
+TOKEN = 'NTkyOTAwMTQwOTIzMjI0MDg5.XRGD4g.HcD9dXkM6PwSK71SsK-u4UY0TAE'
 
 bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
 
-# error handler (mutes errors so comment this out when debugging)
-# @bot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.MissingRole):
-#         await ctx.send("You don't have permission to use this command YOU IDIOT.")
-#     if isinstance(error, commands.CommandNotFound):
-#         await ctx.send(
-#             "That command doesn't exist, type !help or !helpadmin for a list of commands"
-#         )
-#     if isinstance(error, commands.MissingRequiredArgument):
-#         if str(ctx.command) == "ladder":
-#             await ctx.send("The correct usage is !ladder <game>")
-#         if str(ctx.command) == "joinLadder":
-#             await ctx.send("The correct usage is !joinLadder <tag> <game>")
-#         if str(ctx.command) == "quitLadder":
-#             await ctx.send("The correct usage is !quitLadder <game>")
-#         if str(ctx.command) == "changeTag":
-#             await ctx.send("The correct usage is !changeLadder <newTag> <game>")
-#         if str(ctx.command) == "addCharacter":
-#             await ctx.send("The correct usage is !addCharacter <character> <game>")
-#         if str(ctx.command) == "clearCharacters":
-#             await ctx.send("The correct usage is !clearCharacters <game>")
-#         if str(ctx.command) == "beat":
-#             await ctx.send("The correct usage is !beat <@opponent> <game>")
-#         if str(ctx.command) == "confirm":
-#             await ctx.send("The correct usage is !confirm <@opponent> <game>")
-#         if str(ctx.command) == "deny":
-#             await ctx.send("The correct usage is !deny <@opponent> <game>")
-#         if str(ctx.command) == "addMember":
-#             await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
-#         if str(ctx.command) == "removeMember":
-#             await ctx.send("The correct usage is !removeMember <@player> <game>")
-#         if str(ctx.command) == "moveUp":
-#             await ctx.send("The correct usage is !moveUp <@player> <game>")
-#         if str(ctx.command) == "moveDown":
-#             await ctx.send("The correct usage is !moveDown <@player> <game>")
+#error handler (mutes errors so comment this out when debugging)
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.send("You don't have permission to use this command YOU IDIOT.")
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(
+            "That command doesn't exist, type !help or !helpadmin for a list of commands"
+        )
+    if isinstance(error, commands.MissingRequiredArgument):
+        if str(ctx.command) == "ladder":
+            await ctx.send("The correct usage is !ladder <game>")
+        if str(ctx.command) == "joinLadder":
+            await ctx.send("The correct usage is !joinLadder <tag> <game>")
+        if str(ctx.command) == "quitLadder":
+            await ctx.send("The correct usage is !quitLadder <game>")
+        if str(ctx.command) == "changeTag":
+            await ctx.send("The correct usage is !changeLadder <newTag> <game>")
+        if str(ctx.command) == "addCharacter":
+            await ctx.send("The correct usage is !addCharacter <character> <game>")
+        if str(ctx.command) == "clearCharacters":
+            await ctx.send("The correct usage is !clearCharacters <game>")
+        if str(ctx.command) == "beat":
+            await ctx.send("The correct usage is !beat <@opponent> <game>")
+        if str(ctx.command) == "confirm":
+            await ctx.send("The correct usage is !confirm <@opponent> <game>")
+        if str(ctx.command) == "deny":
+            await ctx.send("The correct usage is !deny <@opponent> <game>")
+        if str(ctx.command) == "addMember":
+            await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
+        if str(ctx.command) == "removeMember":
+            await ctx.send("The correct usage is !removeMember <@player> <game>")
+        if str(ctx.command) == "moveUp":
+            await ctx.send("The correct usage is !moveUp <@player> <game>")
+        if str(ctx.command) == "moveDown":
+            await ctx.send("The correct usage is !moveDown <@player> <game>")
 
 
 # help
