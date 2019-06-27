@@ -535,6 +535,19 @@ async def deny(ctx, winner: discord.Member, ladderName):
 
     saveLadders(ladders)
 
+# moves player down a ranking (admin only)
+@bot.command()
+@commands.has_role(admin_role)
+async def resetChallenge(ctx, _player: discord.Member):
+    ladders = loadLadders()
+
+    _player = None
+    for i in ladderData:
+        if str(i.discordid) == str(ctx.author):
+            _player = i
+            _player.confirmId = ""
+            saveLadders(ladders)
+        
 
 # adds another player to ladder (admin only)
 @bot.command()
