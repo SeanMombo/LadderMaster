@@ -487,6 +487,8 @@ async def confirm(ctx, winner: discord.Member, ladderName):
     if winner.confirmId == loser.discordid:
         # check rank difference
         if loser_old_rank > winner_old_rank:
+            winner.confirmId = ""
+            loser.confirmId = ""
             await ctx.send("No need to swap, loser is already below winner")
         else:
             ladderData[loser_old_rank] = winner
@@ -530,6 +532,8 @@ async def deny(ctx, winner: discord.Member, ladderName):
         await ctx.send("Set results have been invalidated")
     else:
         await ctx.send("You don't have any pending sets against this person")
+
+    saveLadders(ladders)
 
 
 # adds another player to ladder (admin only)
