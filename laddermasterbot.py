@@ -15,6 +15,14 @@ import traceback
 # global vars
 admin_role = "Ladder Manager"
 comm_prefix = "."
+gameNames = {
+    "unist": "UNIST",
+    "tekken": "TEKKEN 7",
+    "melee": "SUPER SMASH BROS MELEE",
+    "ssbu": "SUPER SMASH BROS ULTIMATE",
+    "sf3s": "STREET FIGHTER 3RD STRIKE",
+    "dbfz": "DRAGON BALL FIGHTERZ",
+}
 
 # try:
 
@@ -381,14 +389,49 @@ async def ladder(ctx, ladderName):
             await ctx.send("WARNING: 'SMUSH' IS A BANNABLE WORD.")
         return
 
-    gameNames = {
-        "unist": "UNIST",
-        "tekken": "TEKKEN 7",
-        "melee": "SUPER SMASH BROS MELEE",
-        "ssbu": "SUPER SMASH BROS ULTIMATE",
-        "sf3s": "STREET FIGHTER 3RD STRIKE",
-        "dbfz": "DRAGON BALL FIGHTERZ",
-    }
+    try:
+        gameName = gameNames[ladderName]
+    except KeyError:
+        gameName = ladderName.upper()
+
+    # adaptive text formatting rofl
+    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "\n-- QFGC " + gameName + " LADDER --\n"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "------------------\n\n"
+
+    ###### minimalist version to display players in ladder #####
+    rank_counter = 1
+    for _player in ladderData:
+        # add row to table
+        msg += str(rank_counter) + ") " + _player.discordid + "\n"
+        rank_counter += 1
+
+    msg += "```"
+
+    await ctx.send(msg)
+
+# display detailed ladder info
+@bot.command()
+async def ladderDetailed(ctx, ladderName):
+    ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = "Correct usage is !ladder <game>.\n" "Possible games are: "
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        if ladderName == "smush":
+            await ctx.send("WARNING: 'SMUSH' IS A BANNABLE WORD.")
+        return
 
     try:
         gameName = gameNames[ladderName]
@@ -441,6 +484,7 @@ async def ladder(ctx, ladderName):
     msg += "```"
 
     await ctx.send(msg)
+
 
 
 # initiates swap between two players
