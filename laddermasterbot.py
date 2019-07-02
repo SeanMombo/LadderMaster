@@ -16,7 +16,7 @@ from datetime import date, timedelta, datetime
 # global vars
 version_num = "1.1"
 admin_role = "Ladder Manager"
-super_admin_role = "Illuminati"
+super_admin_role = "yeet"
 comm_prefix = "!"
 gameNames = {
     "unist": "UNIST",
