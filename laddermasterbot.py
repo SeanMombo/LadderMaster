@@ -44,7 +44,7 @@ class playerNew:
 def saveLadders(ladders):
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
-    updateSheet(ladders)
+    #updateSheet(ladders)
 
 
 # helper function, loads ladders from pkl
@@ -52,14 +52,11 @@ def loadLadders():
     with open("ladders.pkl", "rb") as input:
         temp = pickle.load(input)
 
+        # UPDATES THE PLAYER CLASS TO A NEW CLASS WITH MORE VARIABLES
         # for _game in temp:
         #     for i, _player in enumerate(temp[_game]):
         #         temp[_game][i] = playerNew(_player.tag, _player.discordid, _player.characters, _player.confirmId, _player.challengeId, _player.challengeMember)
         #         saveLadders(temp)
-
-        for _game in temp:
-            for _player in temp[_game]:       
-                print(_player.winlossData)
 
         return temp
 
@@ -477,8 +474,20 @@ async def beat(ctx, loser: discord.Member, ladderName):
 
 # confirms result of set
 @bot.command()
-async def confirm(ctx, winner: discord.Member, ladderName):
+async def confirm(ctx, winner: discord.Member, score, ladderName):
     ladders = loadLadders()
+
+    winScore = 0
+    lossScore = 0
+    if len(score) == 3 and score[1] == '-' and isinstance(int(score[0]), int) and isinstance(int(score[2]), int):
+        winScore = score[0]
+        lossScore = score[2]
+        if lossScore > winScore:
+            lossScore, winScore = winScore, lossScore
+    else:
+        errmsg = "Score must be input as number hyphen number. eg: 3-0"
+        await ctx.send(errmsg)
+        return
 
     try:
         ladderName = ladderName.lower()
@@ -508,7 +517,16 @@ async def confirm(ctx, winner: discord.Member, ladderName):
         if loser_old_rank > winner_old_rank:
             winner.confirmId = ""
             loser.confirmId = ""
-            await ctx.send("No need to swap, loser is already below winner")
+            windata = winner.winlossData
+            lossdata = loser.winlossData
+
+            winDictPair = windata.setdefault(loser.discordid, [])
+            lossDictPair = lossdata.setdefault(winner.discordid, [])
+
+            winDictPair.append([str(winScore + '-' + lossScore), time.time()])
+            lossDictPair.append([str(lossScore + '-' + winScore), time.time()])
+
+            await ctx.send("WINNERS WINSTREAK HAS IMPROVED BY ONE")
         else:
             ladderData[loser_old_rank] = winner
             ladderData[winner_old_rank] = loser

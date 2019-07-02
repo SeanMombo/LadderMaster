@@ -16,13 +16,13 @@ def confirm(player, beat, score):
     windata = p.winloss
 
 
-
 if __name__ == "__main__":
     p = player()
 
     lis = []
 
-    confirm(p, 0, 'a-1')
+    confirm(p, 0, '2-1')
+
     # lis.append([3,0])
     # lis.append([3,0])
     # lis.append([3,2])
@@ -35,7 +35,14 @@ if __name__ == "__main__":
     windata = p.winloss
 
     #for data in windata:
+    
     windata.update({'wizzrobe':[]})
+    windata.update({'wizzrobe':[]})
+    windata.update({'wizzrobe':[]})
+    windata.update({'wizzrobe':['2-3']})
+    
+    print(windata)
+
     windata.update({'jizzrod':[]})
     data = p.winloss['wizzrobe']
 
