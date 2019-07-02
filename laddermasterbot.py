@@ -16,7 +16,7 @@ from datetime import date, timedelta, datetime
 # global vars
 version_num = "1.1"
 admin_role = "Ladder Manager"
-super_admin_role = "yeet"
+super_admin_role = "Illuminati"
 comm_prefix = "!"
 gameNames = {
     "unist": "UNIST",
@@ -982,7 +982,7 @@ async def removeLadder(ctx, ladderName):
 
 # changes name of ladder
 @bot.command()
-@commands.has_role(super_admin_role)
+@commands.has_role(admin_role)
 async def changeLadderName(ctx, oldName, newName):
     ladders = loadLadders()
 
