@@ -40,17 +40,38 @@ class player:
         self.challengeMember = ""
 
 
+class playerNew:
+    def __init__(
+        self, tag, discordid, characters, confirmId, challengeId, challengeMember
+    ):
+        self.tag = tag
+        self.characters = characters
+        self.discordid = discordid
+        self.confirmId = confirmId
+        self.challengeId = challengeId
+        self.challengeMember = challengeMember
+        self.winlossData = {}
+
+
 # helper function, saves ladders to pkl
 def saveLadders(ladders):
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
-    updateSheet(ladders)
+    # updateSheet(ladders)
 
 
 # helper function, loads ladders from pkl
 def loadLadders():
     with open("ladders.pkl", "rb") as input:
-        return pickle.load(input)
+        temp = pickle.load(input)
+
+        # UPDATES THE PLAYER CLASS TO A NEW CLASS WITH MORE VARIABLES
+        # for _game in temp:
+        #     for i, _player in enumerate(temp[_game]):
+        #         temp[_game][i] = playerNew(_player.tag, _player.discordid, _player.characters, _player.confirmId, _player.challengeId, _player.challengeMember)
+        #         saveLadders(temp)
+
+        return temp
 
 
 TOKEN = ""
@@ -58,6 +79,7 @@ f = open("key.txt", "r")
 if f.mode == "r":
     TOKEN = f.read()
 
+TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XRue4Q.wg3OqxtJqJbzrzknrBSIljfNIb8"
 
 bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
@@ -414,6 +436,7 @@ async def ladder(ctx, ladderName):
 
     await ctx.send(msg)
 
+
 # display detailed ladder info
 @bot.command()
 async def ladderDetailed(ctx, ladderName):
@@ -486,7 +509,6 @@ async def ladderDetailed(ctx, ladderName):
     await ctx.send(msg)
 
 
-
 # initiates swap between two players
 @bot.command()
 async def beat(ctx, loser: discord.Member, ladderName):
@@ -542,8 +564,25 @@ async def beat(ctx, loser: discord.Member, ladderName):
 
 # confirms result of set
 @bot.command()
-async def confirm(ctx, winner: discord.Member, ladderName):
+async def confirm(ctx, winner: discord.Member, score, ladderName):
     ladders = loadLadders()
+
+    winScore = 0
+    lossScore = 0
+    if (
+        len(score) == 3
+        and score[1] == "-"
+        and isinstance(int(score[0]), int)
+        and isinstance(int(score[2]), int)
+    ):
+        winScore = score[0]
+        lossScore = score[2]
+        if lossScore > winScore:
+            lossScore, winScore = winScore, lossScore
+    else:
+        errmsg = "Score must be input as number hyphen number. eg: 3-0"
+        await ctx.send(errmsg)
+        return
 
     try:
         ladderName = ladderName.lower()
@@ -573,7 +612,16 @@ async def confirm(ctx, winner: discord.Member, ladderName):
         if loser_old_rank > winner_old_rank:
             winner.confirmId = ""
             loser.confirmId = ""
-            await ctx.send("No need to swap, loser is already below winner")
+            windata = winner.winlossData
+            lossdata = loser.winlossData
+
+            winDictPair = windata.setdefault(loser.discordid, [])
+            lossDictPair = lossdata.setdefault(winner.discordid, [])
+
+            winDictPair.append([str(winScore + "-" + lossScore), time.time()])
+            lossDictPair.append([str(lossScore + "-" + winScore), time.time()])
+
+            await ctx.send("WINNERS WINSTREAK HAS IMPROVED BY ONE")
         else:
             ladderData[loser_old_rank] = winner
             ladderData[winner_old_rank] = loser
@@ -623,8 +671,23 @@ async def deny(ctx, winner: discord.Member, ladderName):
 # resets challenge id for a player across all games
 @bot.command()
 @commands.has_role(admin_role)
-async def resetChallenge(ctx, _player: discord.Member):
+async def resetChallenge(ctx, _player: discord.Member, ladderName):
     ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = (
+            "Correct usage is !resetChallenge <@player> <game>.\n"
+            "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        return
 
     _player = None
     for ladderName, ladderData in ladders.items():
@@ -801,6 +864,7 @@ async def addLadder(ctx, ladderName):
 
     saveLadders(ladders)
 
+
 # changes name of ladder
 @bot.command()
 @commands.has_role(admin_role)
@@ -811,7 +875,10 @@ async def changeLadderName(ctx, oldName, newName):
         oldName = oldName.lower()
         ladderData = ladders[oldName]
     except KeyError:
-        errmsg = "Correct usage is changeLadderName <oldName> <newName>.\n" "Possible games are: "
+        errmsg = (
+            "Correct usage is changeLadderName <oldName> <newName>.\n"
+            "Possible games are: "
+        )
         for key in ladders:
             errmsg += "'" + key + "'" + ", "
         errmsg = errmsg[:-2]
@@ -847,19 +914,19 @@ def updateSheet(ladders):
     #     ladderSheet = sheet.worksheet(ladderName)
 
     #     # clear cells F13:I33
-    #     cell_list = ladderSheet.range("F13:I33")
+    #     cell_list = ladderSheet.range('F13:I33')
 
     #     xx = 0
     #     yy = 0
 
     #     for cell in cell_list:
-    #         cell.value = ""
+    #         cell.value = ''
 
-    #         yy = cell.row - 13
-    #         xx = cell.col - 6
+    #         yy = cell.row-13
+    #         xx = cell.col-6
     #         if yy < len(ladderData):
     #             if xx == 0:
-    #                 cell.value = yy + 1
+    #                 cell.value = yy+1
     #             elif xx == 1:
     #                 cell.value = ladderData[yy].tag
     #             elif xx == 2:
