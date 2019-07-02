@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-#from texttable import Texttable
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -30,6 +29,16 @@ class player:
         self.challengeId = ""
         self.challengeMember = ""
 
+class playerNew:
+    def __init__(self, tag, discordid, characters, confirmId, challengeId, challengeMember):
+        self.tag = tag
+        self.characters = characters
+        self.discordid = discordid
+        self.confirmId = confirmId
+        self.challengeId = challengeId
+        self.challengeMember = challengeMember
+        self.winlossData = {}
+
 
 # helper function, saves ladders to pkl
 def saveLadders(ladders):
@@ -41,9 +50,18 @@ def saveLadders(ladders):
 # helper function, loads ladders from pkl
 def loadLadders():
     with open("ladders.pkl", "rb") as input:
-        return pickle.load(input)
+        temp = pickle.load(input)
 
+        # for _game in temp:
+        #     for i, _player in enumerate(temp[_game]):
+        #         temp[_game][i] = playerNew(_player.tag, _player.discordid, _player.characters, _player.confirmId, _player.challengeId, _player.challengeMember)
+        #         saveLadders(temp)
 
+        for _game in temp:
+            for _player in temp[_game]:       
+                print(_player.winlossData)
+
+        return temp
 
 
 TOKEN = ""
@@ -51,51 +69,52 @@ f = open("key.txt", "r")
 if f.mode == 'r':
     TOKEN = f.read()
 
+TOKEN = 'NTg3NzE3NjU1NDgyNTk3NDc4.XRue4Q.wg3OqxtJqJbzrzknrBSIljfNIb8'
 
 
 bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
 
 #error handler (mutes errors so comment this out when debugging)
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
-        if str(ctx.command) == "addMember":
-            await ctx.send("That player was not found")
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.BadArgument):
+#         if str(ctx.command) == "addMember":
+#             await ctx.send("That player was not found")
 
-    if isinstance(error, commands.MissingRole):
-        await ctx.send("You don't have permission to use this command YOU IDIOT.")
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(
-            "That command doesn't exist, type !help or !helpadmin for a list of commands"
-        )
-    if isinstance(error, commands.MissingRequiredArgument):
-        if str(ctx.command) == "ladder":
-            await ctx.send("The correct usage is !ladder <game>")
-        if str(ctx.command) == "joinLadder":
-            await ctx.send("The correct usage is !joinLadder <tag> <game>")
-        if str(ctx.command) == "quitLadder":
-            await ctx.send("The correct usage is !quitLadder <game>")
-        if str(ctx.command) == "changeTag":
-            await ctx.send("The correct usage is !changeLadder <newTag> <game>")
-        if str(ctx.command) == "addCharacter":
-            await ctx.send("The correct usage is !addCharacter <character> <game>")
-        if str(ctx.command) == "clearCharacters":
-            await ctx.send("The correct usage is !clearCharacters <game>")
-        if str(ctx.command) == "beat":
-            await ctx.send("The correct usage is !beat <@opponent> <game>")
-        if str(ctx.command) == "confirm":
-            await ctx.send("The correct usage is !confirm <@opponent> <game>")
-        if str(ctx.command) == "deny":
-            await ctx.send("The correct usage is !deny <@opponent> <game>")
-        if str(ctx.command) == "addMember":
-            await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
-        if str(ctx.command) == "removeMember":
-            await ctx.send("The correct usage is !removeMember <@player> <game>")
-        if str(ctx.command) == "moveUp":
-            await ctx.send("The correct usage is !moveUp <@player> <game>")
-        if str(ctx.command) == "moveDown":
-            await ctx.send("The correct usage is !moveDown <@player> <game>")
+#     if isinstance(error, commands.MissingRole):
+#         await ctx.send("You don't have permission to use this command YOU IDIOT.")
+#     if isinstance(error, commands.CommandNotFound):
+#         await ctx.send(
+#             "That command doesn't exist, type !help or !helpadmin for a list of commands"
+#         )
+#     if isinstance(error, commands.MissingRequiredArgument):
+#         if str(ctx.command) == "ladder":
+#             await ctx.send("The correct usage is !ladder <game>")
+#         if str(ctx.command) == "joinLadder":
+#             await ctx.send("The correct usage is !joinLadder <tag> <game>")
+#         if str(ctx.command) == "quitLadder":
+#             await ctx.send("The correct usage is !quitLadder <game>")
+#         if str(ctx.command) == "changeTag":
+#             await ctx.send("The correct usage is !changeLadder <newTag> <game>")
+#         if str(ctx.command) == "addCharacter":
+#             await ctx.send("The correct usage is !addCharacter <character> <game>")
+#         if str(ctx.command) == "clearCharacters":
+#             await ctx.send("The correct usage is !clearCharacters <game>")
+#         if str(ctx.command) == "beat":
+#             await ctx.send("The correct usage is !beat <@opponent> <game>")
+#         if str(ctx.command) == "confirm":
+#             await ctx.send("The correct usage is !confirm <@opponent> <game>")
+#         if str(ctx.command) == "deny":
+#             await ctx.send("The correct usage is !deny <@opponent> <game>")
+#         if str(ctx.command) == "addMember":
+#             await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
+#         if str(ctx.command) == "removeMember":
+#             await ctx.send("The correct usage is !removeMember <@player> <game>")
+#         if str(ctx.command) == "moveUp":
+#             await ctx.send("The correct usage is !moveUp <@player> <game>")
+#         if str(ctx.command) == "moveDown":
+#             await ctx.send("The correct usage is !moveDown <@player> <game>")
 
 
 # help
@@ -538,8 +557,22 @@ async def deny(ctx, winner: discord.Member, ladderName):
 # moves player down a ranking (admin only)
 @bot.command()
 @commands.has_role(admin_role)
-async def resetChallenge(ctx, _player: discord.Member):
+async def resetChallenge(ctx, _player: discord.Member, ladderName):
     ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = (
+            "Correct usage is !resetChallenge <@player> <game>.\n" "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        return
 
     _player = None
     for i in ladderData:
@@ -711,51 +744,52 @@ async def works(ctx):
 
 # SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
 def updateSheet(ladders):
-    ladders = loadLadders()
+    return
+    # ladders = loadLadders()
 
-    # use creds to create a client to interact with the Google Drive API
-    scope = [
-        "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/drive",
-    ]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        "client_secret.json", scope
-    )
-    client = gspread.authorize(creds)
+    # # use creds to create a client to interact with the Google Drive API
+    # scope = [
+    #     "https://spreadsheets.google.com/feeds",
+    #     "https://www.googleapis.com/auth/drive",
+    # ]
+    # creds = ServiceAccountCredentials.from_json_keyfile_name(
+    #     "client_secret.json", scope
+    # )
+    # client = gspread.authorize(creds)
 
-    sheet = client.open("QFGC Linear Ladder Sheets")
+    # sheet = client.open("QFGC Linear Ladder Sheets")
 
-    # iterate over ladder dict
-    for ladderName, ladderData in ladders.items():
-        ladderSheet = sheet.worksheet(ladderName)
+    # # iterate over ladder dict
+    # for ladderName, ladderData in ladders.items():
+    #     ladderSheet = sheet.worksheet(ladderName)
 
-        # clear cells F13:I33
-        cell_list = ladderSheet.range('F13:I33')
+    #     # clear cells F13:I33
+    #     cell_list = ladderSheet.range('F13:I33')
 
-        xx = 0
-        yy = 0
+    #     xx = 0
+    #     yy = 0
 
-        for cell in cell_list:
-            cell.value = ''
+    #     for cell in cell_list:
+    #         cell.value = ''
 
-            yy = cell.row-13
-            xx = cell.col-6
-            if yy < len(ladderData):
-                if xx == 0:
-                    cell.value = yy+1
-                elif xx == 1:
-                    cell.value = ladderData[yy].tag
-                elif xx == 2:
-                    cList = ""
-                    for c in ladderData[yy].characters:
-                        cList += c + ", "
+    #         yy = cell.row-13
+    #         xx = cell.col-6
+    #         if yy < len(ladderData):
+    #             if xx == 0:
+    #                 cell.value = yy+1
+    #             elif xx == 1:
+    #                 cell.value = ladderData[yy].tag
+    #             elif xx == 2:
+    #                 cList = ""
+    #                 for c in ladderData[yy].characters:
+    #                     cList += c + ", "
 
-                    cList = cList[:-2]
-                    cell.value = cList
-                elif xx == 3:
-                    cell.value = ladderData[yy].discordid
+    #                 cList = cList[:-2]
+    #                 cell.value = cList
+    #             elif xx == 3:
+    #                 cell.value = ladderData[yy].discordid
 
-        ladderSheet.update_cells(cell_list)
+    #     ladderSheet.update_cells(cell_list)
 
 
 if __name__ == "__main__":
