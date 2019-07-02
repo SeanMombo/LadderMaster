@@ -47,7 +47,7 @@ class player:
 class playerNew:
     def __init__(
         self, tag, _discordid, _characters=[], _confirmId='', _challengeId='', _challengeMember='',
-        _lastPositionChangeDate = "2019-06-02"
+        _lastPositionChangeDate = "2019-07-02"
     ):
         self.tag = tag
         self.characters = _characters
