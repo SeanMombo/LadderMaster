@@ -1,2 +1,7 @@
 client_secret.json
+key.txt
+*.pem
 .vscode
+.bash_profile
+*.out
+get-pip.py

@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-#from texttable import Texttable
+
+from texttable import Texttable
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -10,10 +11,22 @@ import time
 import pickle
 import operator
 import traceback
+from datetime import date, timedelta, datetime
 
 # global vars
+version_num = "1.1"
 admin_role = "Ladder Manager"
+super_admin_role = "Illuminati"
 comm_prefix = "!"
+gameNames = {
+    "unist": "UNIST",
+    "tekken": "TEKKEN 7",
+    "melee": "SUPER SMASH BROS MELEE",
+    "ssbu": "SUPER SMASH BROS ULTIMATE",
+    "sf3s": "STREET FIGHTER 3RD STRIKE",
+    "dbfz": "DRAGON BALL FIGHTERZ",
+}
+date_format = "%Y-%m-%d"
 
 # try:
 
@@ -31,60 +44,113 @@ class player:
         self.challengeMember = ""
 
 
+class playerNew:
+    def __init__(
+        self, tag, _discordid, _characters=[], _confirmId='', _challengeId='', _challengeMember='',
+        _lastPositionChangeDate = "2019-07-02"
+    ):
+        self.tag = tag
+        self.characters = _characters
+        self.discordid = _discordid
+        self.confirmId = _confirmId
+        self.challengeId = _challengeId
+        self.challengeMember = _challengeMember
+        self.winlossData = {}
+        self.lastPositionChangeDate = _lastPositionChangeDate
+
+
 # helper function, saves ladders to pkl
 def saveLadders(ladders):
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
+    # updateSheet(ladders)
 
 
 # helper function, loads ladders from pkl
 def loadLadders():
     with open("ladders.pkl", "rb") as input:
-        return pickle.load(input)
+        ladders = pickle.load(input)
+
+        # UPDATES THE PLAYER CLASS TO A NEW CLASS WITH MORE VARIABLES if necessary
+        for _game in ladders:
+            for i, _player in enumerate(ladders[_game]):
+                if str(type(_player)) == "<class '__main__.player'>":
+                    ladders[_game][i] = playerNew(
+                        _player.tag,
+                        _player.discordid,
+                        _player.characters,
+                        _player.confirmId,
+                        _player.challengeId,
+                        _player.challengeMember
+                    )
+                    saveLadders(ladders)
+
+        return ladders
 
 
-TOKEN = "NTg3NzE3NjU1NDgyNTk3NDc4.XP6pEQ.fMFiHX0RgXs0ipzUv1iccC68Xi8"
+TOKEN = ""
+f = open("key.txt", "r")
+if f.mode == "r":
+    TOKEN = f.read()
 
 bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
 
 # error handler (mutes errors so comment this out when debugging)
-# @bot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.MissingRole):
-#         await ctx.send("You don't have permission to use this command YOU IDIOT.")
-#     if isinstance(error, commands.CommandNotFound):
-#         await ctx.send(
-#             "That command doesn't exist, type !help or !helpadmin for a list of commands"
-#         )
-#     if isinstance(error, commands.MissingRequiredArgument):
-#         if str(ctx.command) == "ladder":
-#             await ctx.send("The correct usage is !ladder <game>")
-#         if str(ctx.command) == "joinLadder":
-#             await ctx.send("The correct usage is !joinLadder <tag> <game>")
-#         if str(ctx.command) == "quitLadder":
-#             await ctx.send("The correct usage is !quitLadder <game>")
-#         if str(ctx.command) == "changeTag":
-#             await ctx.send("The correct usage is !changeLadder <newTag> <game>")
-#         if str(ctx.command) == "addCharacter":
-#             await ctx.send("The correct usage is !addCharacter <character> <game>")
-#         if str(ctx.command) == "clearCharacters":
-#             await ctx.send("The correct usage is !clearCharacters <game>")
-#         if str(ctx.command) == "beat":
-#             await ctx.send("The correct usage is !beat <@opponent> <game>")
-#         if str(ctx.command) == "confirm":
-#             await ctx.send("The correct usage is !confirm <@opponent> <game>")
-#         if str(ctx.command) == "deny":
-#             await ctx.send("The correct usage is !deny <@opponent> <game>")
-#         if str(ctx.command) == "addMember":
-#             await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
-#         if str(ctx.command) == "removeMember":
-#             await ctx.send("The correct usage is !removeMember <@player> <game>")
-#         if str(ctx.command) == "moveUp":
-#             await ctx.send("The correct usage is !moveUp <@player> <game>")
-#         if str(ctx.command) == "moveDown":
-#             await ctx.send("The correct usage is !moveDown <@player> <game>")
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        if str(ctx.command) == "addMember":
+            await ctx.send("That player was not found")
 
+    if isinstance(error, commands.MissingRole):
+        await ctx.send("You don't have permission to use this command YOU IDIOT.")
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(
+            "That command doesn't exist, type !help or !helpadmin for a list of commands"
+        )
+    if isinstance(error, commands.MissingRequiredArgument):
+        if str(ctx.command) == "ladder":
+            await ctx.send("The correct usage is !ladder <game>")
+        if str(ctx.command) == "ladderDetailed":
+            await ctx.send("The correct usage is !ladderDetailed <game>")
+        if str(ctx.command) == "ladderStats":
+            await ctx.send("The correct usage is !ladderDetailed <game>")
+        if str(ctx.command) == "joinLadder":
+            await ctx.send("The correct usage is !joinLadder <tag> <game>")
+        if str(ctx.command) == "quitLadder":
+            await ctx.send("The correct usage is !quitLadder <game>")
+        if str(ctx.command) == "changeTag":
+            await ctx.send("The correct usage is !changeLadder <newTag> <game>")
+        if str(ctx.command) == "addCharacter":
+            await ctx.send("The correct usage is !addCharacter <character> <game>")
+        if str(ctx.command) == "clearCharacters":
+            await ctx.send("The correct usage is !clearCharacters <game>")
+        if str(ctx.command) == "beat":
+            await ctx.send("The correct usage is !beat <@opponent> <game>")
+        if str(ctx.command) == "confirm":
+            await ctx.send("The correct usage is !confirm <@opponent> <game>")
+        if str(ctx.command) == "deny":
+            await ctx.send("The correct usage is !deny <@opponent> <game>")
+        if str(ctx.command) == "addMember":
+            await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
+        if str(ctx.command) == "removeMember":
+            await ctx.send("The correct usage is !removeMember <@player> <game>")
+        if str(ctx.command) == "moveUp":
+            await ctx.send("The correct usage is !moveUp <@player> <game>")
+        if str(ctx.command) == "moveDown":
+            await ctx.send("The correct usage is !moveDown <@player> <game>")
+        if str(ctx.command) == "addLadder":
+            await ctx.send("The correct usage is !addLadder <game>")
+        if str(ctx.command) == "removeLadder":
+            await ctx.send("The correct usage is !removeLadder <game>")
+        if str(ctx.command) == "changeLadderName":
+            await ctx.send("The correct usage is !changeLadderName <oldname> <newname>")
+
+# version
+@bot.command()
+async def version(ctx):
+    await ctx.send("Current version is " + version_num)
 
 # help
 @bot.command()
@@ -93,9 +159,15 @@ async def help(ctx):
     msg = """```Commands:
 - !ladder <game>: displays ladder
 
+- !ladderDetailed <game>: displays ladder with detailed player info
+
+- !ladderstats <game>: displays ladder with player statistics
+
 - !joinLadder <tag> <game>: allows you to join a ladder
 
 - !quitLadder <game>: allows you to quit a ladder
+
+- !changeTag <new tag> <game>: changes your tag for a certain game
 
 - !addCharacter <character> <game>: adds ONE character to your list of characters
 
@@ -119,34 +191,25 @@ The current possible games are:"""
 # help for admins
 @bot.command()
 @commands.has_role(admin_role)
-async def helpladdermanager(ctx):
+async def helpadmin(ctx):
     msg = """```Ladder Manager commands:
-- !addMember <@player> <tag> <game>: adds a member to a ladder (Ladder Manager only)
+- !addMember <@player> <tag> <game>: adds a member to a ladder
 
-- !removeMember <@player> <game>: removes a member from a ladder (Ladder Manager only)
+- !removeMember <@player> <game>: removes a member from a ladder
 
-- !moveUp <@player> <tag> <game>: moves someone up a rank (Ladder Manager only)
+- !moveUp <@player> <tag> <game>: moves someone up a rank
 
-- !moveDown <@player> <tag> <game>: moves someone down a rank (Ladder Manager only)"""
+- !moveDown <@player> <tag> <game>: moves someone down a rank
+
+- !clearChallenge <@player>: resets a player's challenge id, for debugging
+
+- !addLadder <game>: adds a ladder (will need to add spreadsheet tab manually) (illuminati only)
+
+- !removeLadder <game>: removes a ladder (will need to remove from spreadsheet tab manually) (illuminati only)
+
+- !changeLadderName <oldName> <newName>: changes name of ladder"""
     msg += "```"
     await ctx.send(msg)
-
-
-# ititializes blank ladders for the first time, DO NOT RUN THIS IN THE FUTURE
-@bot.command()
-@commands.has_role(admin_role)
-async def firstTimeInit(ctx):
-    ladders = {
-        "unist": [],
-        "tekken": [],
-        "melee": [],
-        "smush": [],
-        "sf3s": [],
-        "dbfz": [],
-    }
-    await ctx.send("Ladders Initialized")
-
-    saveLadders(ladders)
 
 
 # joins a particular ladder
@@ -166,7 +229,7 @@ async def joinLadder(ctx, tag, ladderName):
         await ctx.send(errmsg)
         return
 
-    _player = player(tag, "{0}".format(ctx.author))
+    _player = playerNew(tag, "{0}".format(ctx.author), _lastPositionChangeDate=str(date.today()))
 
     add = True
     for i in ladderData:
@@ -223,7 +286,7 @@ async def quitLadder(ctx, ladderName):
     await ctx.send(msg)
 
 
-# joins a particular ladder
+# changes player tag
 @bot.command()
 async def changeTag(ctx, newTag, ladderName):
     ladders = loadLadders()
@@ -312,12 +375,8 @@ async def clearCharacters(ctx, ladderName):
     saveLadders(ladders)
     await ctx.send("Character list cleared for " + ladderName + ".")
 
-
-# display ladder info
-@bot.command()
-async def ladder(ctx, ladderName):
     ladders = loadLadders()
-    
+
     try:
         ladderName = ladderName.lower()
         ladderData = ladders[ladderName]
@@ -339,10 +398,13 @@ async def ladder(ctx, ladderName):
         "dbfz": "DRAGON BALL FIGHTERZ",
     }
 
-    gameName = gameNames[ladderName]
+    try:
+        gameName = gameNames[ladderName]
+    except KeyError:
+        gameName = ladderName.upper()
 
     # adaptive text formatting rofl
-    msg = "```\n------------------"
+    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
     for i in range(0, len(gameName)):
         msg += "-"
     msg += "\n-- QFGC " + gameName + " LADDER --\n"
@@ -350,32 +412,50 @@ async def ladder(ctx, ladderName):
         msg += "-"
     msg += "------------------\n\n"
 
-    # ###### verbose table ######
-    # # intialize table
-    # rows = []
-    # rows.append(["", "Tag", "Character(s)", "Discord"])  # header with tag
+    ###### minimalist version to display players in ladder #####
+    rank_counter = 1
+    for _player in ladderData:
+        # add row to table
+        msg += str(rank_counter) + ") " + _player.discordid + "\n"
+        rank_counter += 1
 
-    # # display players in ladder
-    # rank_counter = 1
-    # for _player in ladderData:
+    msg += "```"
 
-    #     # format player character list
-    #     chars = ""
-    #     if len(_player.characters) == 0:  # no characters
-    #         chars = "???"
-    #     else:
-    #         for char in _player.characters:
-    #             chars += char + ", "
-    #             chars = chars[:-2]
+    await ctx.send(msg)
 
-    #     # add row to table
-    #     rows.append([rank_counter, _player.tag, _player.characters, _player.discordid])
-    #     rank_counter += 1
 
-    # # render table
-    # rankTable = Texttable()
-    # rankTable.add_rows(rows)
-    # msg += rankTable.draw()
+# display ladder info
+@bot.command()
+async def ladder(ctx, ladderName):
+    ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = "Correct usage is !ladder <game>.\n" "Possible games are: "
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        if ladderName == "smush":
+            await ctx.send("WARNING: 'SMUSH' IS A BANNABLE WORD.")
+        return
+
+    try:
+        gameName = gameNames[ladderName]
+    except KeyError:
+        gameName = ladderName.upper()
+
+    # adaptive text formatting rofl
+    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "\n-- QFGC " + gameName + " LADDER --\n"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "------------------\n\n"
 
     ###### minimalist version to display players in ladder #####
     rank_counter = 1
@@ -383,6 +463,135 @@ async def ladder(ctx, ladderName):
         # add row to table
         msg += str(rank_counter) + ") " + _player.discordid + "\n"
         rank_counter += 1
+
+    msg += "```"
+
+    await ctx.send(msg)
+
+
+# display detailed ladder info
+@bot.command()
+async def ladderDetailed(ctx, ladderName):
+    ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = "Correct usage is !ladderDetailed <game>.\n" "Possible games are: "
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        if ladderName == "smush":
+            await ctx.send("WARNING: 'SMUSH' IS A BANNABLE WORD.")
+        return
+
+    try:
+        gameName = gameNames[ladderName]
+    except KeyError:
+        gameName = ladderName.upper()
+
+    # adaptive text formatting rofl
+    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "\n-- QFGC " + gameName + " LADDER --\n"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "------------------\n\n"
+
+    ###### verbose table ######
+    # intialize table
+    rows = []
+    rows.append(["", "Tag", "Character(s)", "Discord"])  # header with tag
+
+    # display players in ladder
+    rank_counter = 1
+    for _player in ladderData:
+
+        # format player character list
+        chars = ""
+        if len(_player.characters) == 0:  # no characters
+            chars = "???"
+        else:
+            for char in _player.characters:
+                chars += char + ", "
+            chars = chars[:-2]
+
+        # add row to table
+        rows.append([rank_counter, _player.tag, chars, _player.discordid])
+        rank_counter += 1
+
+    # render table
+    rankTable = Texttable()
+    rankTable.add_rows(rows)
+    msg += rankTable.draw()
+
+    msg += "```"
+
+    await ctx.send(msg)
+
+
+# display ladder stats
+@bot.command()
+async def ladderStats(ctx, ladderName):
+    ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = "Correct usage is !ladderStats <game>.\n" "Possible games are: "
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        if ladderName == "smush":
+            await ctx.send("WARNING: 'SMUSH' IS A BANNABLE WORD.")
+        return
+
+    try:
+        gameName = gameNames[ladderName]
+    except KeyError:
+        gameName = ladderName.upper()
+
+    # adaptive text formatting rofl
+    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "\n-- QFGC " + gameName + " LADDER --\n"
+    for i in range(0, len(gameName)):
+        msg += "-"
+    msg += "------------------\n\n"
+
+    ###### verbose table ######
+    # intialize table
+    rows = []
+    rows.append(["", "Discord", "Rank Held For:"])  # header with tag
+
+    # display players in ladder
+    rank_counter = 1
+    for _player in ladderData:
+
+        # format player character list
+        timeSpent = (
+            date.today()
+            - datetime.strptime(_player.lastPositionChangeDate, date_format).date()
+        )
+        timeSpent = timeSpent.days
+        timeSpent = str(timeSpent) + " days"
+
+        # add row to table
+        rows.append([rank_counter, _player.discordid, timeSpent])
+        rank_counter += 1
+
+    # render table
+    rankTable = Texttable()
+    rankTable.add_rows(rows)
+    msg += rankTable.draw()
 
     msg += "```"
 
@@ -444,8 +653,25 @@ async def beat(ctx, loser: discord.Member, ladderName):
 
 # confirms result of set
 @bot.command()
-async def confirm(ctx, winner: discord.Member, ladderName):
+async def confirm(ctx, winner: discord.Member, ladderName, ):# score parameter omitted for now
     ladders = loadLadders()
+
+    # winScore = 0
+    # lossScore = 0
+    # if (
+    #     len(score) == 3
+    #     and score[1] == "-"
+    #     and isinstance(int(score[0]), int)
+    #     and isinstance(int(score[2]), int)
+    # ):
+    #     winScore = score[0]
+    #     lossScore = score[2]
+    #     if lossScore > winScore:
+    #         lossScore, winScore = winScore, lossScore
+    # else:
+    #     errmsg = "Score must be input as number hyphen number. eg: 3-0"
+    #     await ctx.send(errmsg)
+    #     return
 
     try:
         ladderName = ladderName.lower()
@@ -471,14 +697,26 @@ async def confirm(ctx, winner: discord.Member, ladderName):
 
     # swap ranks between winner and loser
     if winner.confirmId == loser.discordid:
+        # windata = winner.winlossData
+        # lossdata = loser.winlossData
+
+        # winDictPair = windata.setdefault(loser.discordid, [])
+        # lossDictPair = lossdata.setdefault(winner.discordid, [])
+
+        # winDictPair.append([str(winScore + "-" + lossScore), time.time()])
+        # lossDictPair.append([str(lossScore + "-" + winScore), time.time()])
         # check rank difference
         if loser_old_rank > winner_old_rank:
-            await ctx.send("No need to swap, loser is already below winner")
+            winner.confirmId = ""
+            loser.confirmId = ""
+            # await ctx.send("WINNERS WINSTREAK HAS IMPROVED BY ONE")
         else:
             ladderData[loser_old_rank] = winner
             ladderData[winner_old_rank] = loser
             winner.confirmId = ""
             loser.confirmId = ""
+            winner.lastPositionChangeDate = str(date.today())
+            loser.lastPositionChangeDate = str(date.today())
             await ctx.send("Set results confirmed. Ranks have been swapped")
     else:
         await ctx.send("You don't have any pending sets against this person")
@@ -517,6 +755,38 @@ async def deny(ctx, winner: discord.Member, ladderName):
     else:
         await ctx.send("You don't have any pending sets against this person")
 
+    saveLadders(ladders)
+
+
+# resets challenge id for a player across all games
+@bot.command()
+@commands.has_role(admin_role)
+async def resetChallenge(ctx, _player: discord.Member, ladderName):
+    ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = (
+            "Correct usage is !resetChallenge <@player> <game>.\n"
+            "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        return
+
+    _player = None
+    for ladderName, ladderData in ladders.items():
+        for i in ladderData:
+            if str(i.discordid) == str(ctx.author):
+                _player = i
+                _player.confirmId = ""
+                saveLadders(ladders)
+
 
 # adds another player to ladder (admin only)
 @bot.command()
@@ -540,7 +810,7 @@ async def addMember(ctx, new_player: discord.Member, tag, ladderName):
         return
 
     # code essentially same as !joinLadder
-    _player = player(tag, "{0}".format(new_player))
+    _player = playerNew(tag, "{0}".format(new_player), _lastPositionChangeDate=str(date.today()))
 
     add = True
     for i in ladderData:
@@ -671,11 +941,71 @@ async def moveDown(ctx, _player: discord.Member, ladderName):
         await ctx.send("Player shuffled down")
 
 
-# tests if bot's up (dev purposes only)
+# adds a ladder
+@bot.command()
+@commands.has_role(super_admin_role)
+async def addLadder(ctx, ladderName):
+    ladders = loadLadders()
+
+    ladderName = ladderName.lower()
+    ladders[ladderName] = []
+
+    await ctx.send("The " + ladderName + " ladder has been created.")
+
+    saveLadders(ladders)
+
+
+# removes a ladder
+@bot.command()
+@commands.has_role(super_admin_role)
+async def removeLadder(ctx, ladderName):
+    ladders = loadLadders()
+
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = "Correct usage is removeLadder <game>.\n" "Possible games are: "
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        return
+
+    ladders.pop(ladderName)
+
+    await ctx.send("The " + ladderName + " ladder has been removed.")
+
+    saveLadders(ladders)
+
+
+# changes name of ladder
 @bot.command()
 @commands.has_role(admin_role)
-async def works(ctx):
-    await ctx.send("bot's up atm")
+async def changeLadderName(ctx, oldName, newName):
+    ladders = loadLadders()
+
+    try:
+        oldName = oldName.lower()
+        ladderData = ladders[oldName]
+    except KeyError:
+        errmsg = (
+            "Correct usage is changeLadderName <oldName> <newName>.\n"
+            "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        return
+
+    ladders[newName] = ladders.pop(oldName)
+
+    await ctx.send(oldName + " has been renamed to " + newName)
+
+    saveLadders(ladders)
 
 
 # SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
@@ -692,7 +1022,7 @@ def updateSheet(ladders):
     )
     client = gspread.authorize(creds)
 
-    sheet = client.open("TestLadderMasterSheet")
+    sheet = client.open("QFGC Linear Ladder Sheets")
 
     # iterate over ladder dict
     for ladderName, ladderData in ladders.items():
@@ -725,6 +1055,7 @@ def updateSheet(ladders):
                     cell.value = ladderData[yy].discordid
 
         ladderSheet.update_cells(cell_list)
+    return
 
 
 if __name__ == "__main__":
