@@ -14,7 +14,7 @@ import traceback
 from datetime import date, timedelta, datetime
 
 # global vars
-version_num = "1.1"
+version_num = "1.2"
 admin_role = "Ladder Manager"
 super_admin_role = "Illuminati"
 comm_prefix = "!"
@@ -189,10 +189,6 @@ async def on_command_error(ctx, error):
             await ctx.send("The correct usage is !removeLadder <game>")
         if str(ctx.command) == "changeLadderName":
             await ctx.send("The correct usage is !changeLadderName <oldname> <newname>")
-    # if message too long
-    if isinstance(error, commands.CommandInvokeError):
-        await ctx.send("message too long")
-
 
 
 # version
@@ -629,9 +625,8 @@ async def ladderStats(ctx, ladderName):
     ###### verbose table ######
     # intialize table
     rows = []
-    rows.append(
-        ["", "Discord", "Rank Held For:", "Game W/L", "Set W/L"]
-    )  # header with tag
+    header = ["", "Discord", "Rank Held For:", "Game W/L", "Set W/L"]
+    rows.append(header)  # header with tag
 
     # display players in ladder
     rank_counter = 1
@@ -654,13 +649,31 @@ async def ladderStats(ctx, ladderName):
         rank_counter += 1
 
     # render table
-    rankTable = Texttable()
-    rankTable.add_rows(rows)
-    msg += rankTable.draw()
+    
+    # check if table too big:
+    if len(rows) > 15:
+        rowsTopHalf = rows[0:len(rows) // 2]
+        rowsBotHalf = rows[len(rows) // 2:]
+        rowsBotHalf.insert(0, header)
 
-    msg += "```"
+        rankTableTopHalf = Texttable()
+        rankTableTopHalf.add_rows(rowsTopHalf)
+        rankTableBotHalf = Texttable()
+        rankTableBotHalf.add_rows(rowsBotHalf)
 
-    await ctx.send(msg)
+        msgTopHalf = msg + rankTableTopHalf.draw() + "```"
+        msgBotHalf = "```" + rankTableBotHalf.draw() + "```"
+
+        await ctx.send(msgTopHalf)
+        await ctx.send(msgBotHalf)
+    else:
+        rankTable = Texttable()
+        rankTable.add_rows(rows)
+
+        msg += rankTable.draw()
+        msg += "```"
+
+        await ctx.send(msg)
 
 
 # initiates swap between two players
@@ -1119,51 +1132,51 @@ async def changeLadderName(ctx, oldName, newName):
 
 # SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
 def updateSheet(ladders):
-    # ladders = loadLadders()
+    ladders = loadLadders()
 
-    # # use creds to create a client to interact with the Google Drive API
-    # scope = [
-    #     "https://spreadsheets.google.com/feeds",
-    #     "https://www.googleapis.com/auth/drive",
-    # ]
-    # creds = ServiceAccountCredentials.from_json_keyfile_name(
-    #     "client_secret.json", scope
-    # )
-    # client = gspread.authorize(creds)
+    # use creds to create a client to interact with the Google Drive API
+    scope = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        "client_secret.json", scope
+    )
+    client = gspread.authorize(creds)
 
-    # sheet = client.open("QFGC Linear Ladder Sheets")
+    sheet = client.open("QFGC Linear Ladder Sheets")
 
-    # # iterate over ladder dict
-    # for ladderName, ladderData in ladders.items():
-    #     ladderSheet = sheet.worksheet(ladderName)
+    # iterate over ladder dict
+    for ladderName, ladderData in ladders.items():
+        ladderSheet = sheet.worksheet(ladderName)
 
-    #     # clear cells F13:I33
-    #     cell_list = ladderSheet.range('F13:I33')
+        # clear cells F13:I33
+        cell_list = ladderSheet.range('F13:I33')
 
-    #     xx = 0
-    #     yy = 0
+        xx = 0
+        yy = 0
 
-    #     for cell in cell_list:
-    #         cell.value = ''
+        for cell in cell_list:
+            cell.value = ''
 
-    #         yy = cell.row-13
-    #         xx = cell.col-6
-    #         if yy < len(ladderData):
-    #             if xx == 0:
-    #                 cell.value = yy+1
-    #             elif xx == 1:
-    #                 cell.value = ladderData[yy].tag
-    #             elif xx == 2:
-    #                 cList = ""
-    #                 for c in ladderData[yy].characters:
-    #                     cList += c + ", "
+            yy = cell.row-13
+            xx = cell.col-6
+            if yy < len(ladderData):
+                if xx == 0:
+                    cell.value = yy+1
+                elif xx == 1:
+                    cell.value = ladderData[yy].tag
+                elif xx == 2:
+                    cList = ""
+                    for c in ladderData[yy].characters:
+                        cList += c + ", "
 
-    #                 cList = cList[:-2]
-    #                 cell.value = cList
-    #             elif xx == 3:
-    #                 cell.value = ladderData[yy].discordid
+                    cList = cList[:-2]
+                    cell.value = cList
+                elif xx == 3:
+                    cell.value = ladderData[yy].discordid
 
-    #     ladderSheet.update_cells(cell_list)
+        ladderSheet.update_cells(cell_list)
     return
 
 
