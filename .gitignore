@@ -6,4 +6,3 @@ key.txt
 *.out
 get-pip.py
 *.pkl
-*.pem
