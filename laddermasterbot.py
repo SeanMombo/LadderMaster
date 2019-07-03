@@ -819,7 +819,7 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
 
         # update cumulative totals
         winner.gameWins += int(winScore)
-        loser.gameLosses += int(lossScore)
+        loser.gameLosses += int(winScore)
         winner.setWins += 1
         loser.setLosses += 1
 
