@@ -95,7 +95,7 @@ class playerNew2:
 def saveLadders(ladders):
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
-    # updateSheet(ladders)
+    updateSheet(ladders)
 
 
 # helper function, loads ladders from pkl
