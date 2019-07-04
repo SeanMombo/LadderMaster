@@ -1137,6 +1137,42 @@ async def changeLadderName(ctx, oldName, newName):
 
     saveLadders(ladders)
     
+# sets various attribute
+@bot.command()
+async def setAttr(ctx, _player: discord.Member, ladderName, attrName, newValue):
+    ladders = loadLadders()
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = (
+            "wrong args.\n"
+            "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        return
+    
+    # get player info
+    for i in ladderData:
+        if str(i.discordid) == str(_player):
+            _player = i
+    
+    if attrName == 'gameWins':
+        _player.gameWins = int(newValue)
+    elif attrName == 'gameLosses':
+        _player.gameLosses = int(newValue)
+    elif attrName == 'setWins':
+        _player.setWins = int(newValue)
+    elif attrName == 'setLosses':
+        _player.setLosses = int(newValue)
+
+    saveLadders(ladders)
+    await ctx.send("Attribute changed.")
+    
 # updates ladder
 @bot.command()
 @commands.has_role(admin_role)
