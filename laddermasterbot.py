@@ -95,6 +95,11 @@ class playerNew2:
 def saveLadders(ladders):
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
+
+# saves ladders and updates sheets
+def saveLaddersAndSheets(ladders):
+    with open("ladders.pkl", "wb") as output:
+        pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
     updateSheet(ladders)
 
 
@@ -1129,6 +1134,14 @@ async def changeLadderName(ctx, oldName, newName):
     await ctx.send(oldName + " has been renamed to " + newName)
 
     saveLadders(ladders)
+    
+# updates ladder
+@bot.command()
+@commands.has_role(admin_role)
+async def updateLadderSheets(ctx):
+    ladders = loadLadders()
+
+    saveLaddersAndSheets(ladders)
 
 
 # SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
