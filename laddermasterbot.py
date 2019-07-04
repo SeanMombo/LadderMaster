@@ -1142,6 +1142,7 @@ async def updateLadderSheets(ctx):
     ladders = loadLadders()
 
     saveLaddersAndSheets(ladders)
+    await ctx.send("Sheets updated.")
 
 
 # SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
