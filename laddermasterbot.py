@@ -1182,8 +1182,8 @@ async def setAttr(ctx, _player: discord.Member, ladderName, attrName, newValue):
 @commands.has_role(admin_role)
 async def updateLadderSheets(ctx):
     ladders = loadLadders()
-
-    saveLaddersAndSheets(ladders)
+    for i in range(1,50000):
+        saveLaddersAndSheets(ladders)
     await ctx.send("Sheets updated.")
 
 
