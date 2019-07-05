@@ -95,6 +95,10 @@ class playerNew2:
 def saveLadders(ladders):
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
+    try:
+        updateSheet(ladders)
+    except:
+        pass
 
 # saves ladders and updates sheets
 def saveLaddersAndSheets(ladders):
