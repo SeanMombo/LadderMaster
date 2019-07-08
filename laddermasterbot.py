@@ -567,7 +567,8 @@ async def ladderDetailed(ctx, ladderName):
     ###### verbose table ######
     # intialize table
     rows = []
-    rows.append(["", "Tag", "Character(s)", "Discord"])  # header with tag
+    header = ["", "Tag", "Character(s)", "Discord"]
+    rows.append(header)  # header with tag
 
     # display players in ladder
     rank_counter = 1
@@ -587,11 +588,27 @@ async def ladderDetailed(ctx, ladderName):
         rank_counter += 1
 
     # render table
-    rankTable = Texttable()
-    rankTable.add_rows(rows)
-    msg += rankTable.draw()
+    if len(rows) > 12:
+        rowsTopHalf = rows[0:len(rows) // 2]
+        rowsBotHalf = rows[len(rows) // 2:]
+        rowsBotHalf.insert(0, header)
 
-    msg += "```"
+        rankTableTopHalf = Texttable()
+        rankTableTopHalf.add_rows(rowsTopHalf)
+        rankTableBotHalf = Texttable()
+        rankTableBotHalf.add_rows(rowsBotHalf)
+
+        msgTopHalf = msg + rankTableTopHalf.draw() + "```"
+        msgBotHalf = "```" + rankTableBotHalf.draw() + "```"
+
+        await ctx.send(msgTopHalf)
+        await ctx.send(msgBotHalf)
+    else:
+        rankTable = Texttable()
+        rankTable.add_rows(rows)
+
+        msg += rankTable.draw()
+        msg += "```"
 
     await ctx.send(msg)
 
