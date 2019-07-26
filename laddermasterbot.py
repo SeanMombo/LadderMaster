@@ -14,7 +14,7 @@ import traceback
 from datetime import date, timedelta, datetime
 
 # global vars
-version_num = "1.2"
+version_num = "1.3"
 admin_role = "Ladder Manager"
 super_admin_role = "Illuminati"
 comm_prefix = "!"
@@ -27,6 +27,7 @@ gameNames = {
     "dbfz": "DRAGON BALL FIGHTERZ",
 }
 date_format = "%Y-%m-%d"
+ladder_size_threshold = 6 # smallest ladder size that qualifies for boss roles
 
 # try:
 
@@ -100,13 +101,6 @@ def saveLadders(ladders):
     except:
         pass
 
-# saves ladders and updates sheets
-def saveLaddersAndSheets(ladders):
-    with open("ladders.pkl", "wb") as output:
-        pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
-    updateSheet(ladders)
-
-
 # helper function, loads ladders from pkl
 def loadLadders():
     with open("ladders.pkl", "rb") as input:
@@ -125,7 +119,7 @@ def loadLadders():
                         _player.challengeId,
                         _player.challengeMember,
                     )
-                    saveladders(ladders)
+                    saveLadders(ladders)
                 # upgrades playerNew to playerNew2
                 if str(type(_player)) == "<class '__main__.playerNew'>":
                     ladders[_game][i] = playerNew2(
@@ -150,55 +144,55 @@ bot = commands.Bot(command_prefix=comm_prefix, case_insensitive=True)
 bot.remove_command("help")
 
 # error handler (mutes errors so comment this out when debugging)
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
-        if str(ctx.command) == "addMember":
-            await ctx.send("That player was not found")
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.BadArgument):
+#         if str(ctx.command) == "addMember":
+#             await ctx.send("That player was not found")
 
-    if isinstance(error, commands.MissingRole):
-        await ctx.send("You don't have permission to use this command YOU IDIOT.")
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(
-            "That command doesn't exist, type !help or !helpadmin for a list of commands"
-        )
-    if isinstance(error, commands.MissingRequiredArgument):
-        if str(ctx.command) == "ladder":
-            await ctx.send("The correct usage is !ladder <game> or !l <game>")
-        if str(ctx.command) == "ladderDetailed":
-            await ctx.send("The correct usage is !ladderDetailed <game> or !ld <game>")
-        if str(ctx.command) == "ladderStats":
-            await ctx.send("The correct usage is !ladderStats <game> or !ls <game>")
-        if str(ctx.command) == "joinLadder":
-            await ctx.send("The correct usage is !joinLadder <tag> <game>")
-        if str(ctx.command) == "quitLadder":
-            await ctx.send("The correct usage is !quitLadder <game>")
-        if str(ctx.command) == "changeTag":
-            await ctx.send("The correct usage is !changeLadder <newTag> <game>")
-        if str(ctx.command) == "addCharacter":
-            await ctx.send("The correct usage is !addCharacter <character> <game>")
-        if str(ctx.command) == "clearCharacters":
-            await ctx.send("The correct usage is !clearCharacters <game>")
-        if str(ctx.command) == "beat":
-            await ctx.send("The correct usage is !beat <@opponent> <score> <game>")
-        if str(ctx.command) == "confirm":
-            await ctx.send("The correct usage is !confirm <@opponent> <score> <game>")
-        if str(ctx.command) == "deny":
-            await ctx.send("The correct usage is !deny <@opponent> <game>")
-        if str(ctx.command) == "addMember":
-            await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
-        if str(ctx.command) == "removeMember":
-            await ctx.send("The correct usage is !removeMember <@player> <game>")
-        if str(ctx.command) == "moveUp":
-            await ctx.send("The correct usage is !moveUp <@player> <game>")
-        if str(ctx.command) == "moveDown":
-            await ctx.send("The correct usage is !moveDown <@player> <game>")
-        if str(ctx.command) == "addLadder":
-            await ctx.send("The correct usage is !addLadder <game>")
-        if str(ctx.command) == "removeLadder":
-            await ctx.send("The correct usage is !removeLadder <game>")
-        if str(ctx.command) == "changeLadderName":
-            await ctx.send("The correct usage is !changeLadderName <oldname> <newname>")
+#     if isinstance(error, commands.MissingRole):
+#         await ctx.send("You don't have permission to use this command YOU IDIOT.")
+#     if isinstance(error, commands.CommandNotFound):
+#         await ctx.send(
+#             "That command doesn't exist, type !help or !helpadmin for a list of commands"
+#         )
+#     if isinstance(error, commands.MissingRequiredArgument):
+#         if str(ctx.command) == "ladder":
+#             await ctx.send("The correct usage is !ladder <game> or !l <game>")
+#         if str(ctx.command) == "ladderDetailed":
+#             await ctx.send("The correct usage is !ladderDetailed <game> or !ld <game>")
+#         if str(ctx.command) == "ladderStats":
+#             await ctx.send("The correct usage is !ladderStats <game> or !ls <game>")
+#         if str(ctx.command) == "joinLadder":
+#             await ctx.send("The correct usage is !joinLadder <tag> <game>")
+#         if str(ctx.command) == "quitLadder":
+#             await ctx.send("The correct usage is !quitLadder <game>")
+#         if str(ctx.command) == "changeTag":
+#             await ctx.send("The correct usage is !changeLadder <newTag> <game>")
+#         if str(ctx.command) == "addCharacter":
+#             await ctx.send("The correct usage is !addCharacter <character> <game>")
+#         if str(ctx.command) == "clearCharacters":
+#             await ctx.send("The correct usage is !clearCharacters <game>")
+#         if str(ctx.command) == "beat":
+#             await ctx.send("The correct usage is !beat <@opponent> <score> <game>")
+#         if str(ctx.command) == "confirm":
+#             await ctx.send("The correct usage is !confirm <@opponent> <score> <game>")
+#         if str(ctx.command) == "deny":
+#             await ctx.send("The correct usage is !deny <@opponent> <game>")
+#         if str(ctx.command) == "addMember":
+#             await ctx.send("The correct usage is !addMember <@player> <tag> <game>")
+#         if str(ctx.command) == "removeMember":
+#             await ctx.send("The correct usage is !removeMember <@player> <game>")
+#         if str(ctx.command) == "moveUp":
+#             await ctx.send("The correct usage is !moveUp <@player> <game>")
+#         if str(ctx.command) == "moveDown":
+#             await ctx.send("The correct usage is !moveDown <@player> <game>")
+#         if str(ctx.command) == "addLadder":
+#             await ctx.send("The correct usage is !addLadder <game>")
+#         if str(ctx.command) == "removeLadder":
+#             await ctx.send("The correct usage is !removeLadder <game>")
+#         if str(ctx.command) == "changeLadderName":
+#             await ctx.send("The correct usage is !changeLadderName <oldname> <newname>")
 
 
 # version
@@ -821,52 +815,63 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
         if str(i.discordid) == str(ctx.author):
             loser = i
         if str(i.discordid) == str(winner):
-            winner = i
+            _winner = i
 
-    # check scores match
-    if score != winner.scoreProposed:
-        await ctx.send("The proposed scores don't match, please try again.")
-        return
+    # update stats and swap if needed
+    if _winner.confirmId == loser.discordid:
 
-    loser_old_rank = ladderData.index(loser)
-    winner_old_rank = ladderData.index(winner)
+        # check scores match
+        if score != _winner.scoreProposed:
+            await ctx.send("The proposed scores don't match, please try again.")
+            return
 
-    # swap ranks between winner and loser
-    if winner.confirmId == loser.discordid:
+        loser_old_rank = ladderData.index(loser)
+        winner_old_rank = ladderData.index(_winner)
         # # update winLossData
-        # windata = winner.winlossData
+        # windata = _winner.winlossData
         # lossdata = loser.winlossData
 
         # winDictPair = windata.setdefault(loser.discordid, [])
-        # lossDictPair = lossdata.setdefault(winner.discordid, [])
+        # lossDictPair = lossdata.setdefault(_winner.discordid, [])
 
         # winDictPair.append([str(winScore + "-" + lossScore), time.time()])
         # lossDictPair.append([str(lossScore + "-" + winScore), time.time()])
 
         # update cumulative totals
-        winner.gameWins += int(winScore)
-        winner.gameLosses += int(lossScore)
+        _winner.gameWins += int(winScore)
+        _winner.gameLosses += int(lossScore)
         loser.gameLosses += int(winScore)
         loser.gameWins += int(lossScore)
-        winner.setWins += 1
+        _winner.setWins += 1
         loser.setLosses += 1
 
         # check rank difference
         if loser_old_rank > winner_old_rank:
-            winner.confirmId = ""
+            # no need to swap
+            _winner.confirmId = ""
             loser.confirmId = ""
-            winner.scoreProposed = ""
-            await ctx.send("Set results confirmed. Ranks didn't need swapping, w/l data has been recorded.")
+            _winner.scoreProposed = ""
+            await ctx.send("Set results confirmed. w/l data has been recorded, ranks didn't need swapping. Thank you for reporting your match results!")
             # await ctx.send("WINNERS WINSTREAK HAS IMPROVED BY ONE")
         else:
-            ladderData[loser_old_rank] = winner
+            # swap ranks
+            ladderData[loser_old_rank] = _winner
             ladderData[winner_old_rank] = loser
-            winner.confirmId = ""
+            _winner.confirmId = ""
             loser.confirmId = ""
-            winner.scoreProposed = ""
-            winner.lastPositionChangeDate = str(date.today())
+            _winner.scoreProposed = ""
+            _winner.lastPositionChangeDate = str(date.today())
             loser.lastPositionChangeDate = str(date.today())
             await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
+
+            if loser_old_rank == 0 and len(ladderData) >= ladder_size_threshold:
+                # new ladder boss if ladder is big enough
+                role = get(ctx.author.guild.roles, name="Ladder Boss")
+                await winner.add_roles(role)
+                await ctx.author.remove_roles(role)
+                boss_msg = "Congratulations " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
+                await ctx.send(boss_msg)
+
     else:
         await ctx.send("You don't have any pending sets against this person")
 
@@ -1193,15 +1198,6 @@ async def setAttr(ctx, _player: discord.Member, ladderName, attrName, newValue):
 
     saveLadders(ladders)
     await ctx.send("Attribute changed.")
-    
-# updates ladder
-@bot.command()
-@commands.has_role(admin_role)
-async def updateLadderSheets(ctx):
-    ladders = loadLadders()
-    for i in range(1,50000):
-        saveLaddersAndSheets(ladders)
-    await ctx.send("Sheets updated.")
 
 
 # SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
