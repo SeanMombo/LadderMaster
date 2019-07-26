@@ -14,7 +14,7 @@ import traceback
 from datetime import date, timedelta, datetime
 
 # global vars
-version_num = "1.2"
+version_num = "1.3"
 admin_role = "Ladder Manager"
 super_admin_role = "Illuminati"
 comm_prefix = "!"
@@ -27,6 +27,7 @@ gameNames = {
     "dbfz": "DRAGON BALL FIGHTERZ",
 }
 date_format = "%Y-%m-%d"
+ladder_size_threshold = 6 # smallest ladder size that qualifies for boss roles
 
 # try:
 
@@ -831,7 +832,7 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
     loser_old_rank = ladderData.index(loser)
     winner_old_rank = ladderData.index(winner)
 
-    # swap ranks between winner and loser
+    # update stats and swap if needed
     if winner.confirmId == loser.discordid:
         # # update winLossData
         # windata = winner.winlossData
@@ -853,12 +854,14 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
 
         # check rank difference
         if loser_old_rank > winner_old_rank:
+            # no need to swap
             winner.confirmId = ""
             loser.confirmId = ""
             winner.scoreProposed = ""
-            await ctx.send("Set results confirmed. Ranks didn't need swapping, w/l data has been recorded.")
+            await ctx.send("Set results confirmed. w/l data has been recorded, ranks didn't need swapping. Thank you for reporting your match results!")
             # await ctx.send("WINNERS WINSTREAK HAS IMPROVED BY ONE")
         else:
+            # swap ranks
             ladderData[loser_old_rank] = winner
             ladderData[winner_old_rank] = loser
             winner.confirmId = ""
@@ -867,6 +870,14 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
             winner.lastPositionChangeDate = str(date.today())
             loser.lastPositionChangeDate = str(date.today())
             await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
+
+            if loser_old_rank == 0 and len(ladderData) >= ladder_size_threshold:
+                # new ladder boss if ladder is big enough
+                role = get(ctx.author.server.roles, name="Ladder Boss")
+                await winner.add_roles(role)
+                await ctx.author.remove_roles(role)
+                await ctx.send("Congratulations", winner.discordid, "for becoming the new", ladderName, "Ladder Boss!")
+
     else:
         await ctx.send("You don't have any pending sets against this person")
 
