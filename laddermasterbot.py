@@ -17,6 +17,7 @@ from datetime import date, timedelta, datetime
 version_num = "1.3"
 admin_role = "Ladder Manager"
 super_admin_role = "Illuminati"
+ladder_boss_name = "LADDER BOSS"
 comm_prefix = "!"
 gameNames = {
     "unist": "UNIST",
@@ -866,7 +867,7 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
 
             if loser_old_rank == 0 and len(ladderData) >= ladder_size_threshold:
                 # new ladder boss if ladder is big enough
-                role = get(ctx.author.guild.roles, name="Ladder Boss")
+                role = get(ctx.author.guild.roles, name=ladder_boss_name)
                 await winner.add_roles(role)
                 await ctx.author.remove_roles(role)
                 boss_msg = "Congratulations " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
