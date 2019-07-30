@@ -609,8 +609,7 @@ async def ladderDetailed(ctx, ladderName):
 
         msg += rankTable.draw()
         msg += "```"
-
-    await ctx.send(msg)
+        await ctx.send(msg)
 
 
 # display ladder stats
