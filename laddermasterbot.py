@@ -28,13 +28,13 @@ gameNames = {
     "dbfz": "DRAGON BALL FIGHTERZ",
 }
 date_format = "%Y-%m-%d"
-eligibleGames = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers']
+eligibleLadders = ['tekken', 'unist', 'melee', 'smush']
+# eligibleLadders = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers']
 
 # try:
 
 # except Exception:
 #     traceback.print_exc()
-
 
 class player:
     def __init__(self, tag, discordid):
@@ -44,7 +44,6 @@ class player:
         self.confirmId = ""
         self.challengeId = ""
         self.challengeMember = ""
-
 
 class playerNew:
     def __init__(
@@ -65,7 +64,6 @@ class playerNew:
         self.challengeMember = _challengeMember
         self.winlossData = {}
         self.lastPositionChangeDate = _lastPositionChangeDate
-
 
 class playerNew2:
     def __init__(
@@ -92,9 +90,80 @@ class playerNew2:
         self.setLosses = 0
         self.scoreProposed = ""
 
+# adds winstreak attribute
+class playerNew3:
+    def __init__(
+        self,
+        tag,
+        _discordid,
+        _characters=[],
+        _confirmId="",
+        _challengeId="",
+        _challengeMember="",
+        _lastPositionChangeDate=str(date.today()),
+        _gameWins=0,
+        _gameLosses=0,
+        _setWins=0,
+        _setLosses=0,
+        _scoreProposed=""
+    ):
+        self.tag = tag
+        self.characters = _characters
+        self.discordid = _discordid
+        self.confirmId = _confirmId
+        self.challengeId = _challengeId
+        self.challengeMember = _challengeMember
+        self.lastPositionChangeDate = _lastPositionChangeDate
+        self.gameWins = _gameWins
+        self.gameLosses = _gameLosses
+        self.setWins = _setWins
+        self.setLosses = _setLosses
+        self.winstreak = 0
+        self.scoreProposed = _scoreProposed
+
 
 # helper function, saves ladders to pkl
 def saveLadders(ladders):
+    # UPDATES THE PLAYER CLASS TO A NEW CLASS WITH MORE VARIABLES if necessary
+    for _game in ladders:
+        for i, _player in enumerate(ladders[_game]):
+            # upgrades players to playernew if needed
+            if str(type(_player)) == "<class '__main__.player'>":
+                ladders[_game][i] = playerNew(
+                    _player.tag,
+                    _player.discordid,
+                    _player.characters,
+                    _player.confirmId,
+                    _player.challengeId,
+                    _player.challengeMember,
+                )
+            # upgrades playerNew to playerNew2
+            if str(type(_player)) == "<class '__main__.playerNew'>":
+                ladders[_game][i] = playerNew2(
+                    _player.tag,
+                    _player.discordid,
+                    _player.characters,
+                    _player.confirmId,
+                    _player.challengeId,
+                    _player.challengeMember,
+                )
+            # upgrades playerNew2 to playerNew3
+            if str(type(_player)) == "<class '__main__.playerNew2'>":
+                ladders[_game][i] = playerNew3(
+                    _player.tag,
+                    _player.discordid,
+                    _player.characters,
+                    _player.confirmId,
+                    _player.challengeId,
+                    _player.challengeMember,
+                    _player.lastPositionChangeDate,
+                    _player.gameWins,
+                    _player.gameLosses,
+                    _player.setWins,
+                    _player.setLosses,
+                    _player.scoreProposed
+                )
+    
     with open("ladders.pkl", "wb") as output:
         pickle.dump(ladders, output, pickle.HIGHEST_PROTOCOL)
     try:
@@ -107,31 +176,7 @@ def loadLadders():
     with open("ladders.pkl", "rb") as input:
         ladders = pickle.load(input)
 
-        # UPDATES THE PLAYER CLASS TO A NEW CLASS WITH MORE VARIABLES if necessary
-        for _game in ladders:
-            for i, _player in enumerate(ladders[_game]):
-                # upgrades players to playernew if needed
-                if str(type(_player)) == "<class '__main__.player'>":
-                    ladders[_game][i] = playerNew(
-                        _player.tag,
-                        _player.discordid,
-                        _player.characters,
-                        _player.confirmId,
-                        _player.challengeId,
-                        _player.challengeMember,
-                    )
-                    saveLadders(ladders)
-                # upgrades playerNew to playerNew2
-                if str(type(_player)) == "<class '__main__.playerNew'>":
-                    ladders[_game][i] = playerNew2(
-                        _player.tag,
-                        _player.discordid,
-                        _player.characters,
-                        _player.confirmId,
-                        _player.challengeId,
-                        _player.challengeMember,
-                    )
-                    saveLadders(ladders)
+       
 
         return ladders
 
@@ -511,6 +556,9 @@ async def ladder(ctx, ladderName):
         msg += "-"
     msg += "------------------\n\n"
 
+    msg += "The current ladder boss is " + ladderData[0].discordid + ".\n"
+    msg += "He has defended his boss status against " + str(ladderData[0].winstreak) + " consecutive challenges.\n"
+
     ###### minimalist version to display players in ladder #####
     rank_counter = 1
     for _player in ladderData:
@@ -558,6 +606,9 @@ async def ladderDetailed(ctx, ladderName):
     for i in range(0, len(gameName)):
         msg += "-"
     msg += "------------------\n\n"
+
+    msg += "The current ladder boss is " + ladderData[0].discordid + ".\n"
+    msg += "He has defended his boss status against " + str(ladderData[0].winstreak) + " consecutive challenges.\n"
 
     ###### verbose table ######
     # intialize table
@@ -646,6 +697,9 @@ async def ladderStats(ctx, ladderName):
         msg += "-"
     msg += "------------------\n\n"
 
+    msg += "The current ladder boss is " + ladderData[0].discordid + ".\n"
+    msg += "He has defended his boss status against " + str(ladderData[0].winstreak) + " consecutive challenges.\n"
+
     ###### verbose table ######
     # intialize table
     rows = []
@@ -730,6 +784,11 @@ async def beat(ctx, loser: discord.Member, score, ladderName):  # score is 'x-x'
         await ctx.send(errmsg)
         errmsg = "Score must be input as number hyphen number. eg: 3-0, with WINNER'S SCORE FIRST"
         await ctx.send(errmsg)
+        return
+
+    # error for beating oneself
+    if str(loser) == str(ctx.author):
+        await ctx.send("You can't beat yourself you doofus")
         return
 
     try:
@@ -884,7 +943,9 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
             loser.confirmId = ""
             _winner.scoreProposed = ""
             await ctx.send("Set results confirmed. w/l data has been recorded, ranks didn't need swapping. Thank you for reporting your match results!")
-            # await ctx.send("WINNERS WINSTREAK HAS IMPROVED BY ONE")
+            if winner_old_rank == 0:
+                _winner.winstreak += 1
+                await ctx.send("Ladder boss winstreak has improved by 1")
         else:
             # swap ranks
             ladderData[loser_old_rank] = _winner
@@ -896,12 +957,29 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
             loser.lastPositionChangeDate = str(date.today())
             await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
 
-            if loser_old_rank == 0 and len(ladderData) >= ladder_size_threshold:
-                # new ladder boss if ladder is big enough
-                role = get(ctx.author.guild.roles, name=ladder_boss_name)
-                await winner.add_roles(role)
-                await ctx.author.remove_roles(role)
-                boss_msg = "Congratulations " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
+            if loser_old_rank == 0 and ladderName in eligibleLadders:
+                # new ladder boss if ladder is eligible
+                boss_role = get(ctx.author.guild.roles, name=ladder_boss_name)
+                game_role_name = ladderName.upper() + " " + ladder_boss_name
+                game_role = get(ctx.author.guild.roles, name=game_role_name)
+
+                await winner.add_roles(game_role)
+                await ctx.author.remove_roles(game_role)
+
+                await winner.add_roles(boss_role)
+
+                # check if author is a ladder boss in another game before removing role
+                loser_boss_titles = 0
+                for eligibleGame in eligibleLadders:
+                    tempLadder = ladders[eligibleGame]
+                    if tempLadder[0].discordid == str(ctx.author):
+                        loser_boss_titles += 1
+
+                print(loser_boss_titles)
+                if loser_boss_titles < 1:
+                    await ctx.author.remove_roles(boss_role)
+
+                boss_msg = "Congratulations to " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
                 await ctx.send(boss_msg)
 
     else:
@@ -1195,7 +1273,7 @@ async def changeLadderName(ctx, oldName, newName):
 
     saveLadders(ladders)
     
-# sets various attribute
+# sets various attributes
 @bot.command()
 async def setAttr(ctx, _player: discord.Member, ladderName, attrName, newValue):
     ladders = loadLadders()
