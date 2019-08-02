@@ -28,7 +28,7 @@ gameNames = {
     "dbfz": "DRAGON BALL FIGHTERZ",
 }
 date_format = "%Y-%m-%d"
-ladder_size_threshold = 6 # smallest ladder size that qualifies for boss roles
+eligibleGames = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers']
 
 # try:
 
@@ -582,29 +582,30 @@ async def ladderDetailed(ctx, ladderName):
         rows.append([rank_counter, _player.tag, chars, _player.discordid])
         rank_counter += 1
 
-    # render table
-    if len(rows) > 12:
-        rowsTopHalf = rows[0:len(rows) // 2]
-        rowsBotHalf = rows[len(rows) // 2:]
-        rowsBotHalf.insert(0, header)
-
-        rankTableTopHalf = Texttable()
-        rankTableTopHalf.add_rows(rowsTopHalf)
-        rankTableBotHalf = Texttable()
-        rankTableBotHalf.add_rows(rowsBotHalf)
-
-        msgTopHalf = msg + rankTableTopHalf.draw() + "```"
-        msgBotHalf = "```" + rankTableBotHalf.draw() + "```"
-
-        await ctx.send(msgTopHalf)
-        await ctx.send(msgBotHalf)
+    # render table        
     else:
         rankTable = Texttable()
         rankTable.add_rows(rows)
-
         msg += rankTable.draw()
         msg += "```"
-        await ctx.send(msg)
+        # rerender if too long
+        if len(msg) > 1900:
+            rowsTopHalf = rows[0:len(rows) // 2]
+            rowsBotHalf = rows[len(rows) // 2:]
+            rowsBotHalf.insert(0, header)
+
+            rankTableTopHalf = Texttable()
+            rankTableTopHalf.add_rows(rowsTopHalf)
+            rankTableBotHalf = Texttable()
+            rankTableBotHalf.add_rows(rowsBotHalf)
+
+            msgTopHalf = msg + rankTableTopHalf.draw() + "```"
+            msgBotHalf = "```" + rankTableBotHalf.draw() + "```"
+
+            await ctx.send(msgTopHalf)
+            await ctx.send(msgBotHalf)
+        else:
+            await ctx.send(msg)
 
 
 # display ladder stats
@@ -669,32 +670,30 @@ async def ladderStats(ctx, ladderName):
         rows.append([rank_counter, _player.discordid, timeSpent, wlgames, wlsets])
         rank_counter += 1
 
-    # render table
-    
-    # check if table too big:
-    if len(rows) > 12:
-        rowsTopHalf = rows[0:len(rows) // 2]
-        rowsBotHalf = rows[len(rows) // 2:]
-        rowsBotHalf.insert(0, header)
-
-        rankTableTopHalf = Texttable()
-        rankTableTopHalf.add_rows(rowsTopHalf)
-        rankTableBotHalf = Texttable()
-        rankTableBotHalf.add_rows(rowsBotHalf)
-
-        msgTopHalf = msg + rankTableTopHalf.draw() + "```"
-        msgBotHalf = "```" + rankTableBotHalf.draw() + "```"
-
-        await ctx.send(msgTopHalf)
-        await ctx.send(msgBotHalf)
+       # render table        
     else:
         rankTable = Texttable()
         rankTable.add_rows(rows)
-
         msg += rankTable.draw()
         msg += "```"
+        # rerender if too long
+        if len(msg) > 1900:
+            rowsTopHalf = rows[0:len(rows) // 2]
+            rowsBotHalf = rows[len(rows) // 2:]
+            rowsBotHalf.insert(0, header)
 
-        await ctx.send(msg)
+            rankTableTopHalf = Texttable()
+            rankTableTopHalf.add_rows(rowsTopHalf)
+            rankTableBotHalf = Texttable()
+            rankTableBotHalf.add_rows(rowsBotHalf)
+
+            msgTopHalf = msg + rankTableTopHalf.draw() + "```"
+            msgBotHalf = "```" + rankTableBotHalf.draw() + "```"
+
+            await ctx.send(msgTopHalf)
+            await ctx.send(msgBotHalf)
+        else:
+            await ctx.send(msg)
 
 
 # initiates swap between two players
@@ -716,6 +715,15 @@ async def beat(ctx, loser: discord.Member, score, ladderName):  # score is 'x-x'
         if lossScore > winScore:
             lossScore, winScore = winScore, lossScore
     else:
+        errmsg = (
+            "Correct usage is !confirm <@opponent> <score> <game>\n"
+            "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
         errmsg = "Score must be input as number hyphen number. eg: 3-0, with WINNER'S SCORE FIRST"
         await ctx.send(errmsg)
         return
@@ -791,6 +799,16 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
         if lossScore > winScore:
             lossScore, winScore = winScore, lossScore
     else:
+        errmsg = (
+            "Correct usage is !confirm <@opponent> <score> <game>\n"
+            "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+
         errmsg = "Score must be input as number hyphen number. eg: 3-0, with WINNER'S SCORE FIRST"
         await ctx.send(errmsg)
         return
@@ -822,6 +840,16 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
 
         # check scores match
         if score != _winner.scoreProposed:
+            errmsg = (
+            "Correct usage is !confirm <@opponent> <score> <game>\n"
+            "Possible games are: "
+            )
+            for key in ladders:
+                errmsg += "'" + key + "'" + ", "
+            errmsg = errmsg[:-2]
+            errmsg += ". "
+            await ctx.send(errmsg)
+
             await ctx.send("The proposed scores don't match, please try again.")
             return
 
