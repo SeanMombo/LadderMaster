@@ -555,8 +555,8 @@ async def ladder(ctx, ladderName):
         msg += "-"
     msg += "------------------\n\n"
 
-    msg += "The current ladder boss is " + ladderData[0].discordid + ".\n"
-    msg += "He has defended his boss status against " + str(ladderData[0].winstreak) + " consecutive challenges.\n"
+    msg += "Ladder boss: " + ladderData[0].discordid + "\n"
+    msg += "Title defends: " + str(ladderData[0].winstreak) + "\n"
 
     ###### minimalist version to display players in ladder #####
     rank_counter = 1
@@ -606,8 +606,8 @@ async def ladderDetailed(ctx, ladderName):
         msg += "-"
     msg += "------------------\n\n"
 
-    msg += "The current ladder boss is " + ladderData[0].discordid + ".\n"
-    msg += "He has defended his boss status against " + str(ladderData[0].winstreak) + " consecutive challenges.\n"
+    msg += "Ladder boss: " + ladderData[0].discordid + "\n"
+    msg += "Title defends: " + str(ladderData[0].winstreak) + "\n"
 
     ###### verbose table ######
     # intialize table
@@ -696,8 +696,8 @@ async def ladderStats(ctx, ladderName):
         msg += "-"
     msg += "------------------\n\n"
 
-    msg += "The current ladder boss is " + ladderData[0].discordid + ".\n"
-    msg += "He has defended his boss status against " + str(ladderData[0].winstreak) + " consecutive challenges.\n"
+    msg += "Ladder boss: " + ladderData[0].discordid + "\n"
+    msg += "Title defends: " + str(ladderData[0].winstreak) + "\n"
 
     ###### verbose table ######
     # intialize table
