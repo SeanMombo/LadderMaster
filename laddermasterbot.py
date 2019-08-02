@@ -586,10 +586,10 @@ async def ladderDetailed(ctx, ladderName):
     else:
         rankTable = Texttable()
         rankTable.add_rows(rows)
-        msg += rankTable.draw()
-        msg += "```"
+        testmsg = msg + rankTable.draw()
+        testmsg += "```"
         # rerender if too long
-        if len(msg) > 1900:
+        if len(testmsg) > 1900:
             rowsTopHalf = rows[0:len(rows) // 2]
             rowsBotHalf = rows[len(rows) // 2:]
             rowsBotHalf.insert(0, header)
@@ -604,7 +604,9 @@ async def ladderDetailed(ctx, ladderName):
 
             await ctx.send(msgTopHalf)
             await ctx.send(msgBotHalf)
+        # testmsg is fine
         else:
+            msg = testmsg
             await ctx.send(msg)
 
 
@@ -670,14 +672,14 @@ async def ladderStats(ctx, ladderName):
         rows.append([rank_counter, _player.discordid, timeSpent, wlgames, wlsets])
         rank_counter += 1
 
-       # render table        
+    # render table        
     else:
         rankTable = Texttable()
         rankTable.add_rows(rows)
-        msg += rankTable.draw()
-        msg += "```"
+        testmsg = msg + rankTable.draw()
+        testmsg += "```"
         # rerender if too long
-        if len(msg) > 1900:
+        if len(testmsg) > 1900:
             rowsTopHalf = rows[0:len(rows) // 2]
             rowsBotHalf = rows[len(rows) // 2:]
             rowsBotHalf.insert(0, header)
@@ -692,7 +694,9 @@ async def ladderStats(ctx, ladderName):
 
             await ctx.send(msgTopHalf)
             await ctx.send(msgBotHalf)
+        # testmsg is fine
         else:
+            msg = testmsg
             await ctx.send(msg)
 
 
