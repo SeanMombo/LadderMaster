@@ -14,7 +14,7 @@ import traceback
 from datetime import date, timedelta, datetime
 
 # global vars
-version_num = "1.3"
+version_num = "1.4"
 admin_role = "Ladder Manager"
 super_admin_role = "Illuminati"
 ladder_boss_name = "LADDER BOSS"
