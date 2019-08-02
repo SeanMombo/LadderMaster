@@ -28,8 +28,7 @@ gameNames = {
     "dbfz": "DRAGON BALL FIGHTERZ",
 }
 date_format = "%Y-%m-%d"
-eligibleLadders = ['tekken', 'unist', 'melee', 'smush']
-# eligibleLadders = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers']
+eligibleLadders = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers']
 
 # try:
 
