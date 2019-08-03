@@ -26,6 +26,7 @@ gameNames = {
     "ssbu": "SUPER SMASH BROS ULTIMATE",
     "sf3s": "STREET FIGHTER 3RD STRIKE",
     "dbfz": "DRAGON BALL FIGHTERZ",
+    "sf5": "STREET FIGHTER 5 ARCADE EDITION"
 }
 date_format = "%Y-%m-%d"
 eligibleLadders = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers']
