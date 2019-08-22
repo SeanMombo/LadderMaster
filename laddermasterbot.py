@@ -29,7 +29,7 @@ gameNames = {
     "sf5": "STREET FIGHTER 5 ARCADE EDITION"
 }
 date_format = "%Y-%m-%d"
-eligibleLadders = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers']
+eligibleLadders = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers', 'sf3s']
 
 # try:
 
