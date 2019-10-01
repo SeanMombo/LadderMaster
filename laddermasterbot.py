@@ -1325,7 +1325,7 @@ async def inktober(ctx):
     else:
         msg = "Welcome to Inktober! Today's cue is: **"
         msg += inktober_cues[date_delta]
-        msg += "*(). Happy drawing!"
+        msg += "**. Happy drawing!"
         
     await ctx.send(msg)
 
