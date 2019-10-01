@@ -30,6 +30,11 @@ gameNames = {
 }
 date_format = "%Y-%m-%d"
 eligibleLadders = ['tekken', 'unist', 'melee', 'ssbu', 'windjammers', 'sf3s']
+inktober_cues = ['Ring', 'Mindless', 'Bait', 'Freeze', 'Build', 'Husky', 'Enchanted',
+                 'Frail', 'Swing', 'Pattern', 'Snow', 'Dragon', 'Ash', 'Overgrown',
+                 'Legend', 'Wild', 'Ornament', 'Misfit', 'Sling', 'Tread', 'Treasure',
+                 'Ghost', 'Ancient', 'Dizzy', 'Tasty', 'Dark', 'Coat', 'Ride',
+                 'Injured', 'Catch', 'Ripe']
 
 # try:
 
@@ -1309,6 +1314,20 @@ async def setAttr(ctx, _player: discord.Member, ladderName, attrName, newValue):
     saveLadders(ladders)
     await ctx.send("Attribute changed.")
 
+# inktober
+@bot.command()
+async def inktober(ctx):
+
+    date_delta = (date.today() - datetime.strptime("2019-10-01", date_format).date()).days
+
+    if date_delta > 30:
+        msg = "Inktober is over, come back next year!"
+    else:
+        msg = "Welcome to Inktober! Today's cue is: "
+        msg += inktober_cues[date_delta]
+        msg += ". Happy drawing!"
+        
+    await ctx.send(msg)
 
 # SPREADSHEET PART OF THE CODE ---------------------------------------------------------------------------------------
 def updateSheet(ladders):
