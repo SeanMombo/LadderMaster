@@ -1,2 +1,2 @@
-## Patch 1.2 notes:
+## Patch 1.3 notes:
 - automanages ladder boss role
