@@ -1,3 +1,6 @@
+## Patch 1.6 notes:
+- assimilated tekken bot, credits to https://github.com/BKNR/mokujin for all the code and data
+
 ## Patch 1.5 notes:
 - inktober!
 
