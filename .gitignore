@@ -6,3 +6,4 @@ key.txt
 *.out
 get-pip.py
 *.pkl
+__pycache__
