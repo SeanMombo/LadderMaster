@@ -83,12 +83,11 @@ def get_by_move_type(character: dict, move_type: str) -> list:
 
 def move_simplifier(move_input):
     """Removes bells and whistles from the move_input"""
-
+    short_input = short_input.replace("u/b or u or u/f", "uf")
     short_input = move_input.replace("ff", "f,f")
     short_input = short_input.replace(" ", "")
     short_input = short_input.replace("/", "")
     short_input = short_input.replace("+", "")
-    short_input = short_input.replace("u/b or u or u/f", "uf")
 
     # cd works, ewgf doesn't, for some reason
     if short_input[:2].lower() == "cd" and short_input[:3].lower() != "cds":
