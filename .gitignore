@@ -5,5 +5,5 @@ key.txt
 .bash_profile
 *.out
 get-pip.py
-*.pkl
+.pkl
 __pycache__
