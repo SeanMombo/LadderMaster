@@ -414,64 +414,64 @@ async def version(ctx):
     await ctx.send("Current version is " + version_num)
 
 
-# help
-@bot.command()
-async def help(ctx):
-    ladders = loadLadders()
-    msg = """```Commands:
-- !ladder <game>: displays ladder (shortcut: !l)
+# # help
+# @bot.command(aliases=["h"])
+# async def help(ctx):
+#     ladders = loadLadders()
+#     msg = """```Commands:
+# - !ladder <game>: displays ladder (shortcut: !l)
 
-- !ladderDetailed <game>: displays ladder with detailed player info (shortcut: !ld)
+# - !ladderDetailed <game>: displays ladder with detailed player info (shortcut: !ld)
 
-- !ladderstats <game>: displays ladder with player statistics (shortcut:!ls)
+# - !ladderstats <game>: displays ladder with player statistics (shortcut:!ls)
 
-- !joinLadder <tag> <game>: allows you to join a ladder
+# - !joinLadder <tag> <game>: allows you to join a ladder
 
-- !quitLadder <game>: allows you to quit a ladder
+# - !quitLadder <game>: allows you to quit a ladder
 
-- !changeTag <new tag> <game>: changes your tag for a certain game
+# - !changeTag <new tag> <game>: changes your tag for a certain game
 
-- !addCharacter <character> <game>: adds ONE character to your list of characters
+# - !addCharacter <character> <game>: adds ONE character to your list of characters
 
-- !clearCharacters <game>: clears ALL characters from your list of characters
+# - !clearCharacters <game>: clears ALL characters from your list of characters
 
-- !beat <@opponent> <score> <game>: initiates a rank swap between you and someone you beat, put winner's score first (e.g. 3-0 NOT 0-3)
+# - !beat <@opponent> <score> <game>: initiates a rank swap between you and someone you beat, put winner's score first (e.g. 3-0 NOT 0-3)
 
-- !confirm <@opponent> <score> <game>: accepts a rank swap, put winner's score first (e.g. 3-0 NOT 0-3)
+# - !confirm <@opponent> <score> <game>: accepts a rank swap, put winner's score first (e.g. 3-0 NOT 0-3)
 
-- !deny <@opponent> <game>: denies a rank swap
+# - !deny <@opponent> <game>: denies a rank swap
 
-The current possible games are:"""
-    for key in ladders:
-        msg += "'" + key + "'" + ", "
-        msg = msg[:-2]
-    msg += ".\n"
-    msg += "```"
-    await ctx.send(msg)
+# The current possible games are:"""
+#     for key in ladders:
+#         msg += "'" + key + "'" + ", "
+#         msg = msg[:-2]
+#     msg += ".\n"
+#     msg += "```"
+#     await ctx.send(msg)
 
 
-# help for admins
-@bot.command()
-@commands.has_role(admin_role)
-async def helpadmin(ctx):
-    msg = """```Ladder Manager commands:
-- !addMember <@player> <tag> <game>: adds a member to a ladder
+# # help for admins
+# @bot.command()
+# @commands.has_role(admin_role)
+# async def helpadmin(ctx):
+#     msg = """```Ladder Manager commands:
+# - !addMember <@player> <tag> <game>: adds a member to a ladder
 
-- !removeMember <@player> <game>: removes a member from a ladder
+# - !removeMember <@player> <game>: removes a member from a ladder
 
-- !moveUp <@player> <tag> <game>: moves someone up a rank
+# - !moveUp <@player> <tag> <game>: moves someone up a rank
 
-- !moveDown <@player> <tag> <game>: moves someone down a rank
+# - !moveDown <@player> <tag> <game>: moves someone down a rank
 
-- !resetChallenge <@player> <game>: resets a player's challenge id, for debugging
+# - !resetChallenge <@player> <game>: resets a player's challenge id, for debugging
 
-- !addLadder <game>: adds a ladder (will need to add spreadsheet tab manually) (illuminati only)
+# - !addLadder <game>: adds a ladder (will need to add spreadsheet tab manually) (illuminati only)
 
-- !removeLadder <game>: removes a ladder (will need to remove from spreadsheet tab manually) (illuminati only)
+# - !removeLadder <game>: removes a ladder (will need to remove from spreadsheet tab manually) (illuminati only)
 
-- !changeLadderName <oldName> <newName>: changes name of ladder"""
-    msg += "```"
-    await ctx.send(msg)
+# - !changeLadderName <oldName> <newName>: changes name of ladder"""
+#     msg += "```"
+#     await ctx.send(msg)
 
 
 # joins a particular ladder
