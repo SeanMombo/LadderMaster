@@ -19,7 +19,7 @@ from datetime import date, timedelta, datetime
 import tkfinder    # for tekken bot
 
 # global vars
-version_num = "1.4"
+version_num = "1.6"
 admin_role = "Ladder Manager"
 super_admin_role = "Ladder Manager"
 ladder_boss_name = "LADDER BOSS"
