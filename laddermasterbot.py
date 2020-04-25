@@ -711,7 +711,6 @@ async def ladder(ctx, ladderName):
         gameName = ladderName.upper()
 
     # adaptive text formatting rofl
-    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
     for i in range(0, len(gameName)):
         msg += "-"
     msg += "\n-- QFGC " + gameName + " LADDER --\n"
@@ -762,7 +761,6 @@ async def ladderDetailed(ctx, ladderName):
         gameName = ladderName.upper()
 
     # adaptive text formatting rofl
-    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
     for i in range(0, len(gameName)):
         msg += "-"
     msg += "\n-- QFGC " + gameName + " LADDER --\n"
@@ -852,7 +850,6 @@ async def ladderStats(ctx, ladderName):
         gameName = ladderName.upper()
 
     # adaptive text formatting rofl
-    msg = "Sheet Link: <http://tinyurl.com/qfgcladdersheet>\n```\n------------------"
     for i in range(0, len(gameName)):
         msg += "-"
     msg += "\n-- QFGC " + gameName + " LADDER --\n"
