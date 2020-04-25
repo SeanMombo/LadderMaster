@@ -1123,7 +1123,8 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
             _winner.lastPositionChangeDate = str(date.today())
             loser.lastPositionChangeDate = str(date.today())
             await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
-
+            
+            try:
             # new ladder boss if ladder is eligible
             if loser_old_rank == 0 and ladderName in eligibleLadders:
                 boss_role = get(ctx.author.guild.roles, name=ladder_boss_name)
@@ -1148,7 +1149,9 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
 
                 boss_msg = "Congratulations to " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
                 await ctx.send(boss_msg)
-
+            except:
+                e = sys.exc_info()[0]
+                await ctx.send(e)
     else:
         await ctx.send("You don't have any pending sets against this person")
 
