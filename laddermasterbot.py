@@ -241,11 +241,7 @@ def saveLadders(ladders):
 def loadLadders():
     with open("ladders.pkl", "rb") as input:
         ladders = pickle.load(input)
-
-       
-
         return ladders
-
 
 TOKEN = ""
 f = open("key.txt", "r")
@@ -1127,15 +1123,12 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
 
                 # new ladder boss if ladder is eligible
                 if loser_old_rank == 0 and ladderName in eligibleLadders:
-                    boss_role = get(ctx.author.guild.roles, name=ladder_boss_name)
                     game_role_name = ladderName.upper() + " " + ladder_boss_name
                     game_role = get(ctx.author.guild.roles, name=game_role_name)
 
                     await winner.add_roles(game_role)
                     await ctx.author.remove_roles(game_role)
-
-                    await winner.add_roles(boss_role)
-
+                    
                     # check if author is a ladder boss in another game before removing role
                     loser_boss_titles = 0
                     for eligibleGame in eligibleLadders:
