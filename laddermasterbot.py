@@ -1013,66 +1013,26 @@ async def beat(ctx, loser: discord.Member, score, ladderName):  # score is 'x-x'
 # confirms result of set
 @bot.command()
 async def confirm(ctx, winner: discord.Member, score, ladderName):
-    ladders = loadLadders()
-
-    # check that scores were entered properly
-    winScore = 0
-    lossScore = 0
-    if (
-        len(score) == 3
-        and score[1] == "-"
-        and score[0].isdigit()
-        and score[2].isdigit()
-    ):
-        winScore = score[0]
-        lossScore = score[2]
-        if lossScore > winScore:
-            lossScore, winScore = winScore, lossScore
-    else:
-        errmsg = (
-            "Correct usage is !confirm <@opponent> <score> <game>\n"
-            "Possible games are: "
-        )
-        for key in ladders:
-            errmsg += "'" + key + "'" + ", "
-        errmsg = errmsg[:-2]
-        errmsg += ". "
-        await ctx.send(errmsg)
-
-        errmsg = "Score must be input as number hyphen number. eg: 3-0, with WINNER'S SCORE FIRST"
-        await ctx.send(errmsg)
-        return
-
     try:
-        ladderName = ladderName.lower()
-        ladderData = ladders[ladderName]
-    except KeyError:
-        errmsg = (
-            "Correct usage is !confirm <@opponent> <score> <game>\n"
-            "Possible games are: "
-        )
-        for key in ladders:
-            errmsg += "'" + key + "'" + ", "
-        errmsg = errmsg[:-2]
-        errmsg += ". "
-        await ctx.send(errmsg)
-        return
+        ladders = loadLadders()
 
-    # get player info
-    for i in ladderData:
-        if str(i.discordid) == str(ctx.author):
-            loser = i
-        if str(i.discordid) == str(winner):
-            _winner = i
-
-    # update stats and swap if needed
-    if _winner.confirmId == loser.discordid:
-
-        # check scores match
-        if score != _winner.scoreProposed:
+        # check that scores were entered properly
+        winScore = 0
+        lossScore = 0
+        if (
+            len(score) == 3
+            and score[1] == "-"
+            and score[0].isdigit()
+            and score[2].isdigit()
+        ):
+            winScore = score[0]
+            lossScore = score[2]
+            if lossScore > winScore:
+                lossScore, winScore = winScore, lossScore
+        else:
             errmsg = (
-            "Correct usage is !confirm <@opponent> <score> <game>\n"
-            "Possible games are: "
+                "Correct usage is !confirm <@opponent> <score> <game>\n"
+                "Possible games are: "
             )
             for key in ladders:
                 errmsg += "'" + key + "'" + ", "
@@ -1080,52 +1040,92 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
             errmsg += ". "
             await ctx.send(errmsg)
 
-            await ctx.send("The proposed scores don't match, please try again.")
+            errmsg = "Score must be input as number hyphen number. eg: 3-0, with WINNER'S SCORE FIRST"
+            await ctx.send(errmsg)
             return
 
-        loser_old_rank = ladderData.index(loser)
-        winner_old_rank = ladderData.index(_winner)
-        # # update winLossData
-        # windata = _winner.winlossData
-        # lossdata = loser.winlossData
+        try:
+            ladderName = ladderName.lower()
+            ladderData = ladders[ladderName]
+        except KeyError:
+            errmsg = (
+                "Correct usage is !confirm <@opponent> <score> <game>\n"
+                "Possible games are: "
+            )
+            for key in ladders:
+                errmsg += "'" + key + "'" + ", "
+            errmsg = errmsg[:-2]
+            errmsg += ". "
+            await ctx.send(errmsg)
+            return
 
-        # winDictPair = windata.setdefault(loser.discordid, [])
-        # lossDictPair = lossdata.setdefault(_winner.discordid, [])
+        # get player info
+        for i in ladderData:
+            if str(i.discordid) == str(ctx.author):
+                loser = i
+            if str(i.discordid) == str(winner):
+                _winner = i
 
-        # winDictPair.append([str(winScore + "-" + lossScore), time.time()])
-        # lossDictPair.append([str(lossScore + "-" + winScore), time.time()])
+        # update stats and swap if needed
+        if _winner.confirmId == loser.discordid:
 
-        # update cumulative totals
-        _winner.gameWins += int(winScore)
-        _winner.gameLosses += int(lossScore)
-        loser.gameLosses += int(winScore)
-        loser.gameWins += int(lossScore)
-        _winner.setWins += 1
-        loser.setLosses += 1
+            # check scores match
+            if score != _winner.scoreProposed:
+                errmsg = (
+                "Correct usage is !confirm <@opponent> <score> <game>\n"
+                "Possible games are: "
+                )
+                for key in ladders:
+                    errmsg += "'" + key + "'" + ", "
+                errmsg = errmsg[:-2]
+                errmsg += ". "
+                await ctx.send(errmsg)
 
-        # check rank difference
-        if loser_old_rank > winner_old_rank:
-            # no need to swap
-            _winner.confirmId = ""
-            loser.confirmId = ""
-            _winner.scoreProposed = ""
-            await ctx.send("Set results confirmed. w/l data has been recorded, ranks didn't need swapping. Thank you for reporting your match results!")
-            if winner_old_rank == 0:
-                _winner.winstreak += 1
-                await ctx.send("Ladder boss winstreak has improved by 1")
-        else:
-            # swap ranks
-            ladderData[loser_old_rank] = _winner
-            ladderData[winner_old_rank] = loser
-            _winner.confirmId = ""
-            loser.confirmId = ""
-            _winner.scoreProposed = ""
-            _winner.lastPositionChangeDate = str(date.today())
-            loser.lastPositionChangeDate = str(date.today())
-            await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
-            
-            try:
-            # new ladder boss if ladder is eligible
+                await ctx.send("The proposed scores don't match, please try again.")
+                return
+
+            loser_old_rank = ladderData.index(loser)
+            winner_old_rank = ladderData.index(_winner)
+            # # update winLossData
+            # windata = _winner.winlossData
+            # lossdata = loser.winlossData
+
+            # winDictPair = windata.setdefault(loser.discordid, [])
+            # lossDictPair = lossdata.setdefault(_winner.discordid, [])
+
+            # winDictPair.append([str(winScore + "-" + lossScore), time.time()])
+            # lossDictPair.append([str(lossScore + "-" + winScore), time.time()])
+
+            # update cumulative totals
+            _winner.gameWins += int(winScore)
+            _winner.gameLosses += int(lossScore)
+            loser.gameLosses += int(winScore)
+            loser.gameWins += int(lossScore)
+            _winner.setWins += 1
+            loser.setLosses += 1
+
+            # check rank difference
+            if loser_old_rank > winner_old_rank:
+                # no need to swap
+                _winner.confirmId = ""
+                loser.confirmId = ""
+                _winner.scoreProposed = ""
+                await ctx.send("Set results confirmed. w/l data has been recorded, ranks didn't need swapping. Thank you for reporting your match results!")
+                if winner_old_rank == 0:
+                    _winner.winstreak += 1
+                    await ctx.send("Ladder boss winstreak has improved by 1")
+            else:
+                # swap ranks
+                ladderData[loser_old_rank] = _winner
+                ladderData[winner_old_rank] = loser
+                _winner.confirmId = ""
+                loser.confirmId = ""
+                _winner.scoreProposed = ""
+                _winner.lastPositionChangeDate = str(date.today())
+                loser.lastPositionChangeDate = str(date.today())
+                await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
+
+                # new ladder boss if ladder is eligible
                 if loser_old_rank == 0 and ladderName in eligibleLadders:
                     boss_role = get(ctx.author.guild.roles, name=ladder_boss_name)
                     game_role_name = ladderName.upper() + " " + ladder_boss_name
@@ -1149,11 +1149,11 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
 
                     boss_msg = "Congratulations to " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
                     await ctx.send(boss_msg)
-            except:
-                e = traceback.format_exc()
-                await ctx.send(e)
-    else:
-        await ctx.send("You don't have any pending sets against this person")
+        else:
+            await ctx.send("You don't have any pending sets against this person")
+    except:
+        e = traceback.format_exc()
+        await ctx.send(e)
 
     saveLadders(ladders)
 
