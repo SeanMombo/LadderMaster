@@ -33,7 +33,7 @@ gameNames = {
     "gbvs": "GRANBLUE VERSUS"
 }
 date_format = "%Y-%m-%d"
-eligibleLadders = ['p+', 'melee', 'ssbu', 'sf3s', 'ggxrd', 'gbvs', 'chess', 'haxball']
+eligibleLadders = ['p+', 'melee', 'ssbu', 'sf3s', 'ggxrd', 'gbvs', 'chess']
 inktober_cues = ['Ring', 'Mindless', 'Bait', 'Freeze', 'Build', 'Husky', 'Enchanted',
                  'Frail', 'Swing', 'Pattern', 'Snow', 'Dragon', 'Ash', 'Overgrown',
                  'Legend', 'Wild', 'Ornament', 'Misfit', 'Sling', 'Tread', 'Treasure',
