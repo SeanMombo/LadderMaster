@@ -1150,7 +1150,7 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
                     boss_msg = "Congratulations to " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
                     await ctx.send(boss_msg)
             except:
-                e = str(traceback.print_exc())
+                e = traceback.format_exc()
                 await ctx.send(e)
     else:
         await ctx.send("You don't have any pending sets against this person")
