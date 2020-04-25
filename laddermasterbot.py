@@ -687,50 +687,55 @@ async def clearCharacters(ctx, ladderName):
 # display ladder info
 @bot.command(aliases=["l"])
 async def ladder(ctx, ladderName):
-    ladders = loadLadders()
-
     try:
-        ladderName = ladderName.lower()
-        ladderData = ladders[ladderName]
-    except KeyError:
-        errmsg = (
-            "Correct usage is !ladder <game> or !l <game>.\n" "Possible games are: "
-        )
-        for key in ladders:
-            errmsg += "'" + key + "'" + ", "
-        errmsg = errmsg[:-2]
-        errmsg += ". "
-        await ctx.send(errmsg)
-        if ladderName == "smush":
-            await ctx.send("WARNING: 'SMUSH' IS A BANNABLE WORD.")
-        return
+        ladders = loadLadders()
 
-    try:
-        gameName = gameNames[ladderName]
-    except KeyError:
-        gameName = ladderName.upper()
+        try:
+            ladderName = ladderName.lower()
+            ladderData = ladders[ladderName]
+        except KeyError:
+            errmsg = (
+                "Correct usage is !ladder <game> or !l <game>.\n" "Possible games are: "
+            )
+            for key in ladders:
+                errmsg += "'" + key + "'" + ", "
+            errmsg = errmsg[:-2]
+            errmsg += ". "
+            await ctx.send(errmsg)
+            if ladderName == "smush":
+                await ctx.send("WARNING: 'SMUSH' IS A BANNABLE WORD.")
+            return
 
-    # adaptive text formatting rofl
-    for i in range(0, len(gameName)):
-        msg += "-"
-    msg += "\n-- QFGC " + gameName + " LADDER --\n"
-    for i in range(0, len(gameName)):
-        msg += "-"
-    msg += "------------------\n\n"
+        try:
+            gameName = gameNames[ladderName]
+        except KeyError:
+            gameName = ladderName.upper()
 
-    msg += "Ladder boss: " + ladderData[0].discordid + "\n"
-    msg += "Title defends: " + str(ladderData[0].winstreak) + "\n"
+        # adaptive text formatting rofl
+        for i in range(0, len(gameName)):
+            msg += "-"
+        msg += "\n-- QFGC " + gameName + " LADDER --\n"
+        for i in range(0, len(gameName)):
+            msg += "-"
+        msg += "------------------\n\n"
 
-    ###### minimalist version to display players in ladder #####
-    rank_counter = 1
-    for _player in ladderData:
-        # add row to table
-        msg += str(rank_counter) + ") " + _player.discordid + "\n"
-        rank_counter += 1
+        msg += "Ladder boss: " + ladderData[0].discordid + "\n"
+        msg += "Title defends: " + str(ladderData[0].winstreak) + "\n"
 
-    msg += "```"
+        ###### minimalist version to display players in ladder #####
+        rank_counter = 1
+        for _player in ladderData:
+            # add row to table
+            msg += str(rank_counter) + ") " + _player.discordid + "\n"
+            rank_counter += 1
 
-    await ctx.send(msg)
+        msg += "```"
+
+        await ctx.send(msg)
+    except:
+        e = traceback.format_exc()
+        await ctx.send(e)
+        
 
 
 # display detailed ladder info
