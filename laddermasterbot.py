@@ -33,7 +33,7 @@ gameNames = {
     "gbvs": "GRANBLUE VERSUS"
 }
 date_format = "%Y-%m-%d"
-eligibleLadders = ['p+', 'melee', 'ssbu', 'sf3s', 'ggxrd', 'gbvs']
+eligibleLadders = ['p+', 'melee', 'ssbu', 'sf3s', 'ggxrd', 'gbvs', 'chess', 'haxball']
 inktober_cues = ['Ring', 'Mindless', 'Bait', 'Freeze', 'Build', 'Husky', 'Enchanted',
                  'Frail', 'Swing', 'Pattern', 'Snow', 'Dragon', 'Ash', 'Overgrown',
                  'Legend', 'Wild', 'Ornament', 'Misfit', 'Sling', 'Tread', 'Treasure',
@@ -1124,30 +1124,30 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
             loser.lastPositionChangeDate = str(date.today())
             await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
 
-#             # new ladder boss if ladder is eligible
-#             if loser_old_rank == 0 and ladderName in eligibleLadders:
-#                 boss_role = get(ctx.author.guild.roles, name=ladder_boss_name)
-#                 game_role_name = ladderName.upper() + " " + ladder_boss_name
-#                 game_role = get(ctx.author.guild.roles, name=game_role_name)
+            # new ladder boss if ladder is eligible
+            if loser_old_rank == 0 and ladderName in eligibleLadders:
+                boss_role = get(ctx.author.guild.roles, name=ladder_boss_name)
+                game_role_name = ladderName.upper() + " " + ladder_boss_name
+                game_role = get(ctx.author.guild.roles, name=game_role_name)
 
-#                 await winner.add_roles(game_role)
-#                 await ctx.author.remove_roles(game_role)
+                await winner.add_roles(game_role)
+                await ctx.author.remove_roles(game_role)
 
-#                 await winner.add_roles(boss_role)
+                await winner.add_roles(boss_role)
 
-#                 # check if author is a ladder boss in another game before removing role
-#                 loser_boss_titles = 0
-#                 for eligibleGame in eligibleLadders:
-#                     tempLadder = ladders[eligibleGame]
-#                     if tempLadder[0].discordid == str(ctx.author):
-#                         loser_boss_titles += 1
+                # check if author is a ladder boss in another game before removing role
+                loser_boss_titles = 0
+                for eligibleGame in eligibleLadders:
+                    tempLadder = ladders[eligibleGame]
+                    if tempLadder[0].discordid == str(ctx.author):
+                        loser_boss_titles += 1
 
-#                 print(loser_boss_titles)
-#                 if loser_boss_titles < 1:
-#                     await ctx.author.remove_roles(boss_role)
+                print(loser_boss_titles)
+                if loser_boss_titles < 1:
+                    await ctx.author.remove_roles(boss_role)
 
-#                 boss_msg = "Congratulations to " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
-#                 await ctx.send(boss_msg)
+                boss_msg = "Congratulations to " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
+                await ctx.send(boss_msg)
 
     else:
         await ctx.send("You don't have any pending sets against this person")
