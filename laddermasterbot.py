@@ -421,9 +421,9 @@ async def help(ctx):
 
 - !ladderstats <game>: displays ladder with player statistics (shortcut:!ls)
 
-- !joinLadder <tag> <game>: allows you to join a ladder
+- !joinLadder <tag> <game>: allows you to join a ladder (shortcut: !join)
 
-- !quitLadder <game>: allows you to quit a ladder
+- !quitLadder <game>: allows you to quit a ladder (shortcut: !quit)
 
 - !changeTag <new tag> <game>: changes your tag for a certain game
 
@@ -471,7 +471,7 @@ async def helpadmin(ctx):
 
 
 # joins a particular ladder
-@bot.command()
+@bot.command(aliases=["join"])
 async def joinLadder(ctx, tag, ladderName):
     ladders = loadLadders()
 
@@ -510,7 +510,7 @@ async def joinLadder(ctx, tag, ladderName):
 
 
 # quits a ladder
-@bot.command()
+@bot.command(aliases=["quit"])
 async def quitLadder(ctx, ladderName):
     ladders = loadLadders()
 
