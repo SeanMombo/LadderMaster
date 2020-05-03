@@ -1142,8 +1142,6 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
                             loser_boss_titles += 1
 
                     print(loser_boss_titles)
-                    if loser_boss_titles < 1:
-                        await ctx.author.remove_roles(boss_role)
 
                     boss_msg = "Congratulations to " + _winner.discordid + " for becoming the new " + ladderName + " Ladder Boss!"
                     await ctx.send(boss_msg)
