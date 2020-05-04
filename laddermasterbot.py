@@ -20,7 +20,7 @@ import tkfinder    # for tekken bot
 
 # global vars
 version_num = "1.6"
-admin_role = "Ladder Manager"
+admin_role = "TO"
 super_admin_role = "Ladder Manager"
 ladder_boss_name = "LADDER BOSS"
 comm_prefix = "!"
@@ -459,13 +459,16 @@ async def helpadmin(ctx):
 
 - !moveDown <@player> <tag> <game>: moves someone down a rank
 
-- !resetChallenge <@player> <game>: resets a player's challenge id, for debugging
+- !addLadder <game>: adds a ladder
 
-- !addLadder <game>: adds a ladder (will need to add spreadsheet tab manually) (illuminati only)
+- !removeLadder <game>: removes a ladder (DONT USE THIS COMMAND WILLY NILLY, I DON'T HAVE LADDER BACKUPS)
 
-- !removeLadder <game>: removes a ladder (will need to remove from spreadsheet tab manually) (illuminati only)
+- !changeLadderName <oldName> <newName>: changes name of ladder
 
-- !changeLadderName <oldName> <newName>: changes name of ladder"""
+- !resetChallenge <@player> <game>: resets a player's challenge id, for debugging only
+
+- !setAttr <@player> <attribute> <value>: sets a certain attribute for a player. attributes:
+        'gameWins', 'setWins', 'gameLosses', 'setLosses', 'titleDefends'."""
     msg += "```"
     await ctx.send(msg)
 
@@ -1124,6 +1127,7 @@ async def confirm(ctx, winner: discord.Member, score, ladderName):
                 _winner.scoreProposed = ""
                 _winner.lastPositionChangeDate = str(date.today())
                 loser.lastPositionChangeDate = str(date.today())
+                loser.winstreak == 0
                 await ctx.send("Set results confirmed. Ranks have been swapped, and w/l data has been recorded.")
 
                 # new ladder boss if ladder is eligible
@@ -1471,6 +1475,10 @@ async def setAttr(ctx, _player: discord.Member, ladderName, attrName, newValue):
         _player.setWins = int(newValue)
     elif attrName == 'setLosses':
         _player.setLosses = int(newValue)
+    elif attrName == 'titleDefends':
+        _player.winstreak = int(newValue)
+    else:
+        await ctx.send("Something went wrong. Please make sure your command is typed correctly.")
 
     saveLadders(ladders)
     await ctx.send("Attribute changed.")
