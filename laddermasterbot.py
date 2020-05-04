@@ -467,8 +467,8 @@ async def helpadmin(ctx):
 
 - !resetChallenge <@player> <game>: resets a player's challenge id, for debugging only
 
-- !setAttr <@player> <attribute> <value>: sets a certain attribute for a player. attributes:
-        'gameWins', 'setWins', 'gameLosses', 'setLosses', 'titleDefends'."""
+- !setAttr <@player> <game> <attribute> <value>: sets a certain attribute for a player. attributes:
+'gameWins', 'setWins', 'gameLosses', 'setLosses', 'titleDefends'."""
     msg += "```"
     await ctx.send(msg)
 
