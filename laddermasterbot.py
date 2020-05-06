@@ -1293,6 +1293,8 @@ async def removeMember(ctx, target_player: discord.Member, ladderName):
         for i in ladderData:
             if str(i.discordid) == str(target_player):
                 _player = i
+            elif str(i.tag) == str(target_player):
+                _player = i
 
         # if player doesn't exist:
         if _player == None:
