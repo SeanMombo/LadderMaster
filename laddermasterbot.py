@@ -1270,7 +1270,6 @@ async def addMember(ctx, new_player: discord.Member, tag, ladderName):
 @bot.command()
 @commands.has_role(admin_role)
 async def removeMember(ctx, target_player: discord.Member, ladderName):
-    try:
     ladders = loadLadders()
 
     try:
