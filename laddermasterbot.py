@@ -1271,22 +1271,22 @@ async def addMember(ctx, new_player: discord.Member, tag, ladderName):
 @commands.has_role(admin_role)
 async def removeMember(ctx, target_player: discord.Member, ladderName):
     try:
-        ladders = loadLadders()
+    ladders = loadLadders()
 
-        try:
-            ladderName = ladderName.lower()
-            ladderData = ladders[ladderName]
-        except KeyError:
-            errmsg = (
-                "Correct usage is !removeMember <@player> <game>.\n" "Possible games are: "
-            )
-            for key in ladders:
-                errmsg += "'" + key + "'" + ", "
-            errmsg = errmsg[:-2]
-            errmsg += ". "
-            await ctx.send(errmsg)
-            return
-
+    try:
+        ladderName = ladderName.lower()
+        ladderData = ladders[ladderName]
+    except KeyError:
+        errmsg = (
+            "Correct usage is !removeMember <@player> <game>.\n" "Possible games are: "
+        )
+        for key in ladders:
+            errmsg += "'" + key + "'" + ", "
+        errmsg = errmsg[:-2]
+        errmsg += ". "
+        await ctx.send(errmsg)
+        return
+    try:
         # code essentially same as !quitladder
         # get player info
         _player = None
@@ -1303,14 +1303,15 @@ async def removeMember(ctx, target_player: discord.Member, ladderName):
 
         ladderData.remove(_player)
         saveLadders(ladders)
-
-        msg = "{}".format(target_player)
-        msg += " has been removed from the " + ladderName + " ladder."
-
-        await ctx.send(msg)
     except:
         e = traceback.format_exc()
         await ctx.send(e)
+
+    msg = "{}".format(target_player)
+    msg += " has been removed from the " + ladderName + " ladder."
+
+    await ctx.send(msg)
+    
 
 
 # moves player up a ranking (admin only)
