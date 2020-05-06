@@ -1270,41 +1270,45 @@ async def addMember(ctx, new_player: discord.Member, tag, ladderName):
 @bot.command()
 @commands.has_role(admin_role)
 async def removeMember(ctx, target_player: discord.Member, ladderName):
-    ladders = loadLadders()
-
     try:
-        ladderName = ladderName.lower()
-        ladderData = ladders[ladderName]
-    except KeyError:
-        errmsg = (
-            "Correct usage is !removeMember <@player> <game>.\n" "Possible games are: "
-        )
-        for key in ladders:
-            errmsg += "'" + key + "'" + ", "
-        errmsg = errmsg[:-2]
-        errmsg += ". "
-        await ctx.send(errmsg)
-        return
+        ladders = loadLadders()
 
-    # code essentially same as !quitladder
-    # get player info
-    _player = None
-    for i in ladderData:
-        if str(i.discordid) == str(target_player):
-            _player = i
+        try:
+            ladderName = ladderName.lower()
+            ladderData = ladders[ladderName]
+        except KeyError:
+            errmsg = (
+                "Correct usage is !removeMember <@player> <game>.\n" "Possible games are: "
+            )
+            for key in ladders:
+                errmsg += "'" + key + "'" + ", "
+            errmsg = errmsg[:-2]
+            errmsg += ". "
+            await ctx.send(errmsg)
+            return
 
-    # if player doesn't exist:
-    if _player == None:
-        await ctx.send("Player is not in this ladder.")
-        return
+        # code essentially same as !quitladder
+        # get player info
+        _player = None
+        for i in ladderData:
+            if str(i.discordid) == str(target_player):
+                _player = i
 
-    ladderData.remove(_player)
-    saveLadders(ladders)
+        # if player doesn't exist:
+        if _player == None:
+            await ctx.send("Player is not in this ladder.")
+            return
 
-    msg = "{}".format(target_player)
-    msg += " has been removed from the " + ladderName + " ladder."
+        ladderData.remove(_player)
+        saveLadders(ladders)
 
-    await ctx.send(msg)
+        msg = "{}".format(target_player)
+        msg += " has been removed from the " + ladderName + " ladder."
+
+        await ctx.send(msg)
+    except:
+        e = traceback.format_exc()
+        await ctx.send(e)
 
 
 # moves player up a ranking (admin only)
