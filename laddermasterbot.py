@@ -468,7 +468,8 @@ async def helpadmin(ctx):
 - !resetChallenge <@player> <game>: resets a player's challenge id, for debugging only
 
 - !setAttr <@player> <game> <attribute> <value>: sets a certain attribute for a player. attributes:
-'gameWins', 'setWins', 'gameLosses', 'setLosses', 'titleDefends'. THESE ARE CASE SENSITIVE."""
+'gameWins', 'setWins', 'gameLosses', 'setLosses', 'titleDefends', 'lastPosDate. THESE ARE CASE SENSITIVE.
+Format for date: yyyy-mm-dd"""
     msg += "```"
     await ctx.send(msg)
 
@@ -1483,6 +1484,8 @@ async def setAttr(ctx, _player: discord.Member, ladderName, attrName, newValue):
         _player.setLosses = int(newValue)
     elif attrName == 'titleDefends':
         _player.winstreak = int(newValue)
+    elif attrName == 'lastPosDate':
+        _player.lastPositionChangeDate = str(newValue) 
     else:
         await ctx.send("Something went wrong. Please make sure your command is typed correctly.")
 
